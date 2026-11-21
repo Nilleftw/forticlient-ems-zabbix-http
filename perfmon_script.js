@@ -31,8 +31,8 @@ function headers(grafana, json) {
         if (csrf) req.addHeader('X-CSRFToken: ' + csrf);
     } else {
         req.addHeader('X-Grafana-Org-Id: ' + org);
-        req.addHeader('Origin: ' + base);
     }
+    req.addHeader('Origin: ' + base);
     var pairs = [];
     Object.keys(cookies).forEach(function (key) { pairs.push(key + '=' + cookies[key]); });
     if (pairs.length) req.addHeader('Cookie: ' + pairs.join('; '));
@@ -54,8 +54,16 @@ checked(200, 'signin');
 captureCookies();
 if (!Object.keys(cookies).length) throw 'EMS perfmon signin returned no session cookie';
 
+headers(false, false);
+req.get(base + '/api/v1/session/check');
+checked(200, 'session check');
+captureCookies();
+
 headers(false, true);
 req.post(base + '/api/v1/performance_dashboard/login', '');
+if (req.getStatus() === 403)
+    throw 'EMS perfmon Grafana login HTTP 403 (CSRF cookie ' +
+        (csrf ? 'present' : 'missing') + '; check EMS account Performance permission)';
 checked(200, 'Grafana login');
 captureCookies();
 
