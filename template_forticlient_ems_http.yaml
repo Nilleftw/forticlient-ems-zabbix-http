@@ -1,0 +1,408 @@
+Unable to open session log file "/home/nisamu/.cache/starship/session_8426245122059017.log": Os { code: 30, kind: ReadOnlyFilesystem, message: "Read-only file system" }!
+zabbix_export:
+  version: '7.0'
+  template_groups:
+  - uuid: 02fdd4938b02498eac9bb7ccc7c703a0
+    name: Templates/Network devices
+  templates:
+  - uuid: ac47c814a17458bd8e2b3a47cbc0cbfe
+    template: FortiClient EMS by HTTP
+    name: FortiClient EMS by HTTP
+    description: FortiClient EMS 7.4.8 license monitoring by site-specific HTTPS session API. One Zabbix host per EMS site; no SNMP dependency. No license triggers until verified in lab.
+    groups:
+    - name: Templates/Network devices
+    items:
+    - uuid: 9790167c09195b42923e0927f9d5b0a6
+      name: 'Site {$EMS.API.SITE}: API license data'
+      type: SCRIPT
+      key: ems.api.license.raw
+      delay: 5m
+      history: 1d
+      trends: '0'
+      value_type: TEXT
+      params: |
+        var p = JSON.parse(value);
+        var site = p.site;
+        var base = p.base_url.replace(/\/$/, '');
+        if (!/^https:\/\/[^/]+$/.test(base)) throw 'Invalid EMS API URL';
+        if (!site || !p.username || !p.password) throw 'EMS API credentials or site missing';
+
+        var req = new HttpRequest();
+        req.addHeader('Accept: application/json');
+        req.addHeader('Content-Type: application/json');
+        req.addHeader('EMS-Call-Type: 2');
+        req.post(base + '/api/v1/auth/signin', JSON.stringify({
+            name: p.username, password: p.password, site: site
+        }));
+        if (req.getStatus() !== 200) throw 'EMS API signin HTTP ' + req.getStatus() + ' for site ' + site;
+
+        var headers = req.getHeaders(true);
+        var cookies = [];
+        var csrf = '';
+        Object.keys(headers).forEach(function (name) {
+            if (name.toLowerCase() !== 'set-cookie') return;
+            var values = headers[name];
+            if (!Array.isArray(values)) values = [values];
+            values.forEach(function (header) {
+                var pair = String(header).split(';', 1)[0];
+                var equals = pair.indexOf('=');
+                if (equals <= 0) return;
+                cookies.push(pair);
+                if (pair.slice(0, equals).toLowerCase() === 'csrftoken') csrf = pair.slice(equals + 1);
+            });
+        });
+        if (!cookies.length) throw 'EMS API signin returned no session cookie for site ' + site;
+
+        req.clearHeader();
+        req.addHeader('Accept: application/json');
+        req.addHeader('EMS-Call-Type: 2');
+        req.addHeader('Cookie: ' + cookies.join('; '));
+        req.addHeader('Referer: ' + base + '/');
+        if (csrf) req.addHeader('X-CSRFToken: ' + csrf);
+        var body = req.get(base + '/api/v1/license/get');
+        if (req.getStatus() !== 200) throw 'EMS API license/get HTTP ' + req.getStatus() + ' for site ' + site;
+
+        var response = JSON.parse(body);
+        if (!response.result || Number(response.result.retval) !== 1 || !response.data)
+            throw 'EMS API license/get returned an unsuccessful result for site ' + site;
+        var data = response.data;
+        if (!data.used || !data.vdom_seats || !Array.isArray(data.licenses))
+            throw 'EMS API license/get schema changed for site ' + site;
+
+        function count(value, field) {
+            var n = Number(value);
+            if (value === null || value === undefined || value === '' ||
+                !isFinite(n) || n < 0 || Math.floor(n) !== n)
+                throw 'Invalid EMS license count: ' + field;
+            return n;
+        }
+        function license(kind) {
+            var used = count(data.used[kind], 'used.' + kind);
+            var allocated = count(data.vdom_seats[kind], 'vdom_seats.' + kind);
+            var expiration = null;
+            data.licenses.forEach(function (entry) {
+                if (entry && entry.type === kind && typeof entry.expiry_date === 'string' &&
+                    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(entry.expiry_date) &&
+                    (expiration === null || entry.expiry_date < expiration))
+                    expiration = entry.expiry_date;
+            });
+            var pct = allocated > 0 ? 100 * used / allocated : null;
+            return {
+                used: used,
+                allocated: allocated,
+                available: Math.max(0, allocated - used),
+                utilization: pct,
+                expiry_date: expiration,
+                summary: used + ' / ' + allocated + ' (' + (pct === null ? 'n/a' : pct.toFixed(2) + '%') + ')'
+            };
+        }
+        return JSON.stringify({epp: license('epp'), ztna: license('ztna')});
+      timeout: 30s
+      parameters:
+      - name: base_url
+        value: '{$EMS.API.URL}'
+      - name: site
+        value: '{$EMS.API.SITE}'
+      - name: username
+        value: '{$EMS.API.USERNAME}'
+      - name: password
+        value: '{$EMS.API.PASSWORD}'
+      description: Logs in to the configured EMS site and fetches /api/v1/license/get once per polling interval. Only normalized license counts and expiry dates are stored; credentials and cookies stay inside the script execution.
+      tags:
+      - tag: component
+        value: raw-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+    - uuid: d3d30dc1005a5c39b5d7091a2db8e01b
+      name: 'Site {$EMS.API.SITE}: EPP Used'
+      type: DEPENDENT
+      key: ems.api.license.epp.used
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).epp.used;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: EPP
+    - uuid: 290075571e9a5138b46e2da9abad0213
+      name: 'Site {$EMS.API.SITE}: EPP Allocated'
+      type: DEPENDENT
+      key: ems.api.license.epp.allocated
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).epp.allocated;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: EPP
+    - uuid: 7a8cad5e8d225588ba2b90322ccfd857
+      name: 'Site {$EMS.API.SITE}: EPP Available'
+      type: DEPENDENT
+      key: ems.api.license.epp.available
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).epp.available;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: EPP
+    - uuid: 190efc618f1451e4bcb08f8281200889
+      name: 'Site {$EMS.API.SITE}: EPP Utilization'
+      type: DEPENDENT
+      key: ems.api.license.epp.utilization
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: FLOAT
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).epp.utilization;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: EPP
+      units: '%'
+    - uuid: a9311f4012505759a8b013f180489c9c
+      name: 'Site {$EMS.API.SITE}: EPP Earliest expiry date'
+      type: DEPENDENT
+      key: ems.api.license.epp.expiry_date
+      delay: '0'
+      history: 30d
+      trends: '0'
+      value_type: CHAR
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).epp.expiry_date;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: EPP
+      description: Earliest expiry_date for this license type; EMS returns a local timestamp without timezone. No expiry trigger until semantics are validated.
+    - uuid: 082a4b15fb7c5257a2d416a872ff4540
+      name: 'Site {$EMS.API.SITE}: EPP Summary'
+      type: DEPENDENT
+      key: ems.api.license.epp.summary
+      delay: '0'
+      history: 7d
+      trends: '0'
+      value_type: CHAR
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).epp.summary;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: EPP
+    - uuid: 4dfbceb34211582e8570c22996ec0fb5
+      name: 'Site {$EMS.API.SITE}: ZTNA Used'
+      type: DEPENDENT
+      key: ems.api.license.ztna.used
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).ztna.used;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: ZTNA
+    - uuid: 082fd50ce46d5e26b5f6f7de0d241823
+      name: 'Site {$EMS.API.SITE}: ZTNA Allocated'
+      type: DEPENDENT
+      key: ems.api.license.ztna.allocated
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).ztna.allocated;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: ZTNA
+    - uuid: 41e0d518518d5e27a9ad8871696d1897
+      name: 'Site {$EMS.API.SITE}: ZTNA Available'
+      type: DEPENDENT
+      key: ems.api.license.ztna.available
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).ztna.available;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: ZTNA
+    - uuid: e734a66e4bf859ba8b337d6daa14aa1d
+      name: 'Site {$EMS.API.SITE}: ZTNA Utilization'
+      type: DEPENDENT
+      key: ems.api.license.ztna.utilization
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: FLOAT
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).ztna.utilization;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: ZTNA
+      units: '%'
+    - uuid: 8f794ce7118a534d8801bedd9a34fa21
+      name: 'Site {$EMS.API.SITE}: ZTNA Earliest expiry date'
+      type: DEPENDENT
+      key: ems.api.license.ztna.expiry_date
+      delay: '0'
+      history: 30d
+      trends: '0'
+      value_type: CHAR
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).ztna.expiry_date;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: ZTNA
+      description: Earliest expiry_date for this license type; EMS returns a local timestamp without timezone. No expiry trigger until semantics are validated.
+    - uuid: 1edbf5fdef1b5745b80577a4cc6be8e6
+      name: 'Site {$EMS.API.SITE}: ZTNA Summary'
+      type: DEPENDENT
+      key: ems.api.license.ztna.summary
+      delay: '0'
+      history: 7d
+      trends: '0'
+      value_type: CHAR
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - |-
+          var n = JSON.parse(value).ztna.summary;
+          return n === null ? null : n;
+      tags:
+      - tag: component
+        value: license-api
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      - tag: license_type
+        value: ZTNA
+    macros:
+    - macro: '{$EMS.API.URL}'
+      value: ''
+      description: Base HTTPS URL of EMS, for example https://ems.example.com:443. Set on host.
+    - macro: '{$EMS.API.SITE}'
+      value: default
+      description: EMS site name for this Zabbix host.
+    - macro: '{$EMS.API.USERNAME}'
+      value: ''
+      description: EMS API username; set on host.
+    - macro: '{$EMS.API.PASSWORD}'
+      type: SECRET_TEXT
+      description: EMS API password; set on host as secret text.
