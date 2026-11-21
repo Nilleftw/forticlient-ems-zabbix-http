@@ -78,6 +78,9 @@ function count(value, field) {
                 expiration = entry.expiry_date;
         });
         var pct = allocated > 0 ? 100 * used / allocated : null;
+        var expiryEpoch = expiration === null ? 0 : Math.floor(Date.parse(expiration + 'Z') / 1000);
+        if (!isFinite(expiryEpoch) || expiryEpoch < 0)
+            throw 'Invalid EMS license expiry date: ' + kind;
         return {
             used: used,
             allocated: allocated,
@@ -87,6 +90,7 @@ function count(value, field) {
             available: Math.max(0, allocated - used),
             utilization: pct,
             expiry_date: expiration,
+            expiry_epoch: expiryEpoch,
             summary: used + ' / ' + allocated + ' (' + (pct === null ? 'n/a' : pct.toFixed(2) + '%') + ')'
         };
     }
