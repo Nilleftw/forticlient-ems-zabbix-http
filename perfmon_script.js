@@ -1,5 +1,5 @@
 var p = JSON.parse(value);
-var base = p.base_url.replace(/\/$/, '');
+var base = p.base_url.replace(/\/$/, '').replace(/:443$/, '');
 if (!/^https:\/\/[^/]+$/.test(base) || !p.username || !p.password)
     throw 'Invalid EMS perfmon parameters';
 
