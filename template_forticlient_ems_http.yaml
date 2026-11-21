@@ -451,23 +451,46 @@ zabbix_export:
             try { return JSON.parse(body); }
             catch (e) { throw 'EMS perfmon ' + operation + ' returned invalid JSON'; }
         }
+        function reason(body) {
+            var detail = String(body || '');
+            try {
+                var errorResponse = JSON.parse(detail);
+                detail = String((errorResponse.result && errorResponse.result.message) ||
+                    errorResponse.message || errorResponse.error || '');
+            } catch (ignored) {}
+            if (/csrf|cross.site|origin|referer/i.test(detail)) return 'CSRF or origin rejected';
+            if (/permission|privilege|forbidden|access.denied/i.test(detail)) return 'permission denied';
+            if (/session|authenticat|login|credential/i.test(detail)) return 'session rejected';
+            return 'unclassified';
+        }
         var org = '1';
         req = headers(false, true);
-        req.post(base + '/api/v1/auth/signin', JSON.stringify({
+        var signinBody = req.post(base + '/api/v1/auth/signin', JSON.stringify({
             name: p.username, password: p.password
         }));
         checked(200, 'signin');
+        var signin = parsed(signinBody, 'signin');
+        if (!signin.result || Number(signin.result.retval) !== 1)
+            throw 'EMS perfmon signin rejected (' + reason(signinBody) + ')';
         captureCookies();
         if (!Object.keys(cookies).length) throw 'EMS perfmon signin returned no session cookie';
 
         req = headers(false, false);
-        req.get(base + '/api/v1/session/check');
+        var sessionCheckBody = req.get(base + '/api/v1/session/check');
         checked(200, 'session check');
+        var sessionCheck = parsed(sessionCheckBody, 'session check');
+        if (!sessionCheck.result || Number(sessionCheck.result.retval) !== 1)
+            throw 'EMS perfmon session check rejected (' + reason(sessionCheckBody) + ')';
         captureCookies();
 
         req = headers(false, true);
         var sessionUpdateBody = req.post(base + '/api/v1/session/update',
             JSON.stringify({site: null}));
+        if (req.getStatus() === 403)
+            throw 'EMS perfmon global session selection HTTP 403 (' +
+                reason(sessionUpdateBody) + '; session cookie ' +
+                (Object.keys(cookies).length ? 'present' : 'missing') + '; CSRF cookie ' +
+                (csrf ? 'present' : 'missing') + ')';
         checked(200, 'global session selection');
         var sessionUpdate = parsed(sessionUpdateBody, 'global session selection');
         if (!sessionUpdate.result || Number(sessionUpdate.result.retval) !== 1)
@@ -477,17 +500,7 @@ zabbix_export:
         req = headers(false, false);
         var grafanaLoginBody = req.post(base + '/api/v1/performance_dashboard/login', '');
         if (req.getStatus() === 403) {
-            var reason = 'unclassified';
-            var detail = String(grafanaLoginBody || '');
-            try {
-                var errorResponse = JSON.parse(detail);
-                detail = String((errorResponse.result && errorResponse.result.message) ||
-                    errorResponse.message || errorResponse.error || '');
-            } catch (ignored) {}
-            if (/csrf|cross.site|origin|referer/i.test(detail)) reason = 'CSRF or origin rejected';
-            else if (/permission|privilege|forbidden|access.denied/i.test(detail)) reason = 'permission denied';
-            else if (/session|authenticat|login|credential/i.test(detail)) reason = 'session rejected';
-            throw 'EMS perfmon Grafana login HTTP 403 (' + reason +
+            throw 'EMS perfmon Grafana login HTTP 403 (' + reason(grafanaLoginBody) +
                 '; CSRF cookie ' + (csrf ? 'present' : 'missing') + ')';
         }
         checked(200, 'Grafana login');
