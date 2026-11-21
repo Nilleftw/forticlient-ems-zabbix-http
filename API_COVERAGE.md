@@ -11,7 +11,7 @@ The routes below were observed and tested against FortiClient EMS 7.4.8 Linux. A
 | System | `GET /api/v1/system/ha/info`, `GET /api/v1/system/signatures/poll`, `GET /api/v1/system/check_upgrade`, `GET /api/v1/system/cloud/repackager/status` | HA, signature, upgrade and repackager status |
 | Certificates | `GET /api/v1/server_certificates/index`, `GET /api/v1/client_certificates/index` | Counts and server certificate expiry summary |
 | Inventory | `GET /api/v1/sites/names/index`, `GET /api/v1/workgroups/index` | Site and workgroup counts |
-| Performance | `POST /api/v1/performance_dashboard/login`, `GET /api/v1/performance_dashboard/dashboard_search`, internal Grafana dashboard definition and data query | Normalized performance metrics |
+| Performance | `POST /api/v1/performance_dashboard/login`, `GET /api/v1/performance_dashboard/dashboard_search`, internal Grafana dashboard definition and data query | Normalized CPU, RAM, disk, network, database, and process metrics; swap and duplicate endpoint count are not queried |
 
 Each group makes one sign-in request and then its listed calls per polling interval. Disable a group's Script master item to avoid those requests. Dependent items do not make separate API requests.
 
