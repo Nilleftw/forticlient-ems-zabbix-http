@@ -12,6 +12,7 @@ Create one Zabbix host per EMS site and set these host macros:
 | `{$EMS.API.SITE}` | Site name, such as `default` |
 | `{$EMS.API.USERNAME}` | EMS account with access to the selected site |
 | `{$EMS.API.PASSWORD}` | Password stored as **Secret text** |
+| `{$EMS.API.PERFMON.EXTENDED}` | `0` by default; set to `1` to query optional diagnostic series |
 
 Item names show the resolved site name in Latest data. The template does not add a `site:{$EMS.API.SITE}` item tag because Zabbix displays user macros in item tags literally in that view. If site-based problem routing is needed, set a literal host tag such as `site:default` on each EMS host.
 
@@ -24,13 +25,15 @@ Each collection group has one Script master item and dependent metrics. **Disabl
 | License | `ems.api.license.raw` | 5m | Site | Enabled | EPP, ZTNA, all active license types, trial status |
 | Endpoints | `ems.api.endpoints.raw` | 10m | Site | Enabled | Total, online, offline, managed, unmanaged |
 | Security | `ems.api.security.raw` | 30m | Site | Enabled | Vulnerabilities, affected endpoints, profile/tag errors, active forensics |
-| Performance | `ems.api.perfmon.raw` | 5m | Global | Enabled | CPU, RAM, disks, network, database, EMS processes |
+| Performance | `ems.api.perfmon.raw` | 5m | Global | Enabled | CPU, RAM, highest disk usage, EMS node count, database latency; optional diagnostics |
 | System | `ems.api.system.raw` | 15m | Global | Enabled | HA members, signature update, upgrade and repackager status |
 | Certificates | `ems.api.certificates.raw` | 1h | Global | Enabled | Certificate counts, expiry within 30 days, earliest expiry |
 | Alerts | `ems.api.alerts.raw` | 10m | Site | Disabled | Alert count and unread alerts for the API account |
 | Inventory | `ems.api.inventory.raw` | 1h | Global | Disabled | Site and workgroup counts |
 
-The Alerts and Inventory master and dependent items are disabled by default because unread alerts are account-specific and site/workgroup counts rarely change. The Performance swap item, duplicate online-endpoint count, and CPU-core count are also disabled. The Performance script does not query swap or the duplicate endpoint count. Enable these items only if useful for the deployment. For multi-site EMS, enable the global groups on only one host to avoid collecting the same data repeatedly. Some global groups require an EMS account with global administrator access.
+The Alerts and Inventory master and dependent items are disabled by default because unread alerts are account-specific and site/workgroup counts rarely change. Performance swap, duplicate online-endpoint count, and CPU-core count are also disabled. The Performance script does not query swap or the duplicate endpoint count. Database connection count, network rates and connections, keep-alive metrics, and per-process CPU/RAM are optional diagnostics: their items are disabled and their Grafana queries are skipped by default. To collect them, set `{$EMS.API.PERFMON.EXTENDED}` to `1` and enable the desired dependent items. For multi-site EMS, enable the global groups on only one host to avoid collecting the same data repeatedly. Some global groups require an EMS account with global administrator access.
+
+The disk item is the highest usage across all returned volumes, including `/boot` when present. The API data identifies disk devices rather than mount points, so the template does not exclude `/boot` automatically. A full boot partition can also prevent upgrades. Use host-level disk monitoring when mount-specific alerts are needed.
 
 ## License discovery
 
@@ -66,6 +69,6 @@ The license, dashboard, and several other routes were observed in the EMS web in
 
 ## Validation
 
-Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Six collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. All active EMS API items were supported in the lab. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. No trigger expression errors or active problems were present during validation.
+Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Six collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default.
 
 References: [Zabbix Script items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/script), [dependent items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/dependent_items), and [template import](https://www.zabbix.com/documentation/7.0/en/manual/api/reference/configuration/import).
