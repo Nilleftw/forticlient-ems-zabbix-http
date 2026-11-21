@@ -196,7 +196,7 @@ zabbix_export:
         parameters:
         - |-
           var n = JSON.parse(value).epp.utilization;
-          return n === null ? null : n;
+          return n === null ? 0 : n;
       tags:
       - tag: component
         value: license-api
@@ -205,6 +205,7 @@ zabbix_export:
       - tag: license_type
         value: EPP
       units: '%'
+      description: Reports 0 when no seats are allocated so the numeric item remains supported. Check Allocated or Summary to distinguish unlicensed from unused seats.
     - uuid: 5e97e958772f4b93bbae3a0164058427
       name: 'Site {$EMS.API.SITE}: EPP Earliest expiry date'
       type: DEPENDENT
@@ -336,7 +337,7 @@ zabbix_export:
         parameters:
         - |-
           var n = JSON.parse(value).ztna.utilization;
-          return n === null ? null : n;
+          return n === null ? 0 : n;
       tags:
       - tag: component
         value: license-api
@@ -345,6 +346,7 @@ zabbix_export:
       - tag: license_type
         value: ZTNA
       units: '%'
+      description: Reports 0 when no seats are allocated so the numeric item remains supported. Check Allocated or Summary to distinguish unlicensed from unused seats.
     - uuid: a011f810500a4706b58e9bb930dd4caa
       name: 'Site {$EMS.API.SITE}: ZTNA Earliest expiry date'
       type: DEPENDENT
