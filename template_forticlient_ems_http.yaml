@@ -405,7 +405,7 @@ zabbix_export:
       params: |
         var p = JSON.parse(value);
         var base = p.base_url.replace(/\/$/, '');
-        if (!/^https:\/\/[^/]+$/.test(base) || !p.site || !p.username || !p.password)
+        if (!/^https:\/\/[^/]+$/.test(base) || !p.username || !p.password)
             throw 'Invalid EMS perfmon parameters';
 
         var req = new HttpRequest();
@@ -453,7 +453,7 @@ zabbix_export:
         var org = '1';
         headers(false, true);
         req.post(base + '/api/v1/auth/signin', JSON.stringify({
-            name: p.username, password: p.password, site: p.site
+            name: p.username, password: p.password
         }));
         checked(200, 'signin');
         captureCookies();
@@ -579,8 +579,6 @@ zabbix_export:
       parameters:
       - name: base_url
         value: '{$EMS.API.URL}'
-      - name: site
-        value: '{$EMS.API.SITE}'
       - name: username
         value: '{$EMS.API.USERNAME}'
       - name: password
