@@ -465,6 +465,15 @@ zabbix_export:
         captureCookies();
 
         headers(false, true);
+        var sessionUpdateBody = req.post(base + '/api/v1/session/update',
+            JSON.stringify({site: null}));
+        checked(200, 'global session selection');
+        var sessionUpdate = parsed(sessionUpdateBody, 'global session selection');
+        if (!sessionUpdate.result || Number(sessionUpdate.result.retval) !== 1)
+            throw 'EMS perfmon could not select global session';
+        captureCookies();
+
+        headers(false, true);
         req.post(base + '/api/v1/performance_dashboard/login', '');
         if (req.getStatus() === 403)
             throw 'EMS perfmon Grafana login HTTP 403 (CSRF cookie ' +
