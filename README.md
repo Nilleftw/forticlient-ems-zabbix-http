@@ -1,18 +1,18 @@
 # FortiClient EMS by HTTP
 
-Fristående Zabbix 7.0-template för licensövervakning via FortiClient EMS 7.4.8 API. Importera [template_forticlient_ems_http.yaml](template_forticlient_ems_http.yaml). Ingen SNMP-interface eller SNMP-discovery krävs.
+Standalone Zabbix 7.0 template for license monitoring through the FortiClient EMS 7.4.8 API. Import [template_forticlient_ems_http.yaml](template_forticlient_ems_http.yaml). No SNMP interface or SNMP discovery is required.
 
-Varje Zabbix-host representerar en EMS-site. Flera hosts kan peka på samma EMS URL och använda olika site-uppgifter. Sätt följande host-makron i Zabbix:
+Each Zabbix host represents one EMS site. Multiple hosts can point to the same EMS URL while using different site credentials. Set these host macros in Zabbix:
 
-| Makro | Värde |
+| Macro | Value |
 |---|---|
-| `{$EMS.API.URL}` | EMS bas-URL, exempelvis `https://ems.example.com:443` |
-| `{$EMS.API.SITE}` | Site-namn; `default` i labbet |
-| `{$EMS.API.USERNAME}` | API-användare |
-| `{$EMS.API.PASSWORD}` | API-lösenord som *Secret text* |
+| `{$EMS.API.URL}` | EMS base URL, for example `https://ems.example.com:443` |
+| `{$EMS.API.SITE}` | Site name; `default` in the lab |
+| `{$EMS.API.USERNAME}` | EMS API username |
+| `{$EMS.API.PASSWORD}` | EMS API password stored as *Secret text* |
 
-Ett Script item loggar in mot `/api/v1/auth/signin` och hämtar `/api/v1/license/get` med sessionscookies och CSRF-header. Beroende items visar använda, tilldelade och lediga EPP-/ZTNA-licenser, förbrukning, sammanfattning och tidigaste utgångsdatum. Inga credentials, cookies, serienummer eller host-ID sparas som item-värden. Inga triggers ingår före labbverifiering.
+One Script item signs in through `/api/v1/auth/signin` and calls `/api/v1/license/get` with the session cookies and CSRF header. Dependent items expose used, allocated, and available EPP and ZTNA licenses, utilization, a summary, and the earliest expiration date. Credentials, cookies, serial numbers, and host IDs are not stored as item values. No triggers are included before lab validation.
 
-**Status:** YAML och Zabbix 7.0-exportstruktur är kontrollerade, och sessionsflödet har testats med simulerat API-svar. Faktisk import och insamling från EMS återstår. Endpointen `/api/v1/license/get` har observerats i EMS webbgränssnitt men inte verifierats mot Fortinets OpenAPI-JSON.
+**Validation status:** The YAML and Zabbix 7.0 export structure have been checked, and the session flow has been tested with a simulated API response. Import into Zabbix and polling against EMS have not yet been tested. `/api/v1/license/get` was observed in the EMS web interface but has not been checked against the Fortinet OpenAPI specification.
 
-Referenser: [Zabbix Script item](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/script), [Zabbix HttpRequest](https://www.zabbix.com/documentation/7.0/en/manual/config/items/preprocessing/javascript/javascript_objects), [Zabbix template-export](https://www.zabbix.com/documentation/7.0/en/manual/xml_export_import/templates).
+References: [Zabbix Script item](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/script), [Zabbix HttpRequest](https://www.zabbix.com/documentation/7.0/en/manual/config/items/preprocessing/javascript/javascript_objects), and [Zabbix template export](https://www.zabbix.com/documentation/7.0/en/manual/xml_export_import/templates).
