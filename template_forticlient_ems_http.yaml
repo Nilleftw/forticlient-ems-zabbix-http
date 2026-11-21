@@ -8,8 +8,18 @@ zabbix_export:
     template: FortiClient EMS by HTTP
     name: FortiClient EMS by HTTP
     description: FortiClient EMS 7.4.8 site-scoped HTTPS monitoring with optional API collection groups. One Zabbix host per site; no SNMP dependency. Internal endpoints may change between EMS releases.
+    vendor:
+      name: Nilleftw
+      version: 7.0-0
     groups:
     - name: Templates/Network devices
+    tags:
+    - tag: class
+      value: software
+    - tag: target
+      value: forticlient-ems
+    - tag: target
+      value: fortinet
     items:
     - uuid: 685979695d344f30877527025b5ca584
       name: 'Site {$EMS.API.SITE}: API license data'
