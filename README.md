@@ -61,6 +61,10 @@ The following triggers are enabled by default:
 
 Endpoint online percentage and critical vulnerability triggers are included but **disabled by default**; their usefulness depends on deployment policy and existing findings. If a master item is intentionally disabled, disable its no-data trigger as well. Zabbix notifications also require an action configured in Zabbix.
 
+## Host dashboard
+
+The template includes **EMS: Overview**, a host dashboard with EPP and ZTNA license summaries, online endpoint count, server certificates expiring within 30 days, 24-hour CPU/RAM/disk graphs, an EPP used-versus-allocated seats graph, and current problems. It uses enabled items only. Open it from the monitored host's Dashboards tab after linking the template.
+
 ## Data handling and compatibility
 
 The template stores normalized monitoring values instead of raw EMS responses. This matters because some EMS API responses contain sensitive fields. Credentials and cookies remain inside a Script execution. Default triggers focus on API availability, license capacity and expiry, server certificate expiry, and HA availability.
@@ -69,6 +73,6 @@ The license, dashboard, and several other routes were observed in the EMS web in
 
 ## Validation
 
-Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Six collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default.
+Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Six collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. The host dashboard imported with all nine widgets linked to the intended items.
 
 References: [Zabbix Script items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/script), [dependent items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/dependent_items), and [template import](https://www.zabbix.com/documentation/7.0/en/manual/api/reference/configuration/import).
