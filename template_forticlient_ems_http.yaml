@@ -567,16 +567,18 @@ zabbix_export:
             'System Overall CPU Usage (%)': 'cpu_pct',
             'RAM System Usage (%)': 'ram_pct',
             'Disk Space Usage (%)': 'disk_max_pct',
-            'DB Connections (totals)': 'db_connections',
             'EMS nodes online': 'ems_nodes_online',
-            'DB nodes latency (ms)': 'db_latency_max_ms',
-            'Real Time Network Traffic Rate': 'network',
-            'Network Connections': 'network_connections',
-            'Keep Alive Processing (ms)': 'keep_alive_ms',
-            'Keep Alive Processing (records)': 'keep_alive_records',
-            'EMS processes CPU usage': 'ems_process_cpu_max',
-            'EMS process RAM Usage (%)': 'ems_process_ram_max_pct'
+            'DB nodes latency (ms)': 'db_latency_max_ms'
         };
+        if (String(p.extended) === '1') {
+            wanted['DB Connections (totals)'] = 'db_connections';
+            wanted['Real Time Network Traffic Rate'] = 'network';
+            wanted['Network Connections'] = 'network_connections';
+            wanted['Keep Alive Processing (ms)'] = 'keep_alive_ms';
+            wanted['Keep Alive Processing (records)'] = 'keep_alive_records';
+            wanted['EMS processes CPU usage'] = 'ems_process_cpu_max';
+            wanted['EMS process RAM Usage (%)'] = 'ems_process_ram_max_pct';
+        }
         var queries = [], byRef = {};
         dto.spec.panels.forEach(function (panel) {
             var metric = wanted[panel.title];
@@ -655,6 +657,8 @@ zabbix_export:
         value: '{$EMS.API.USERNAME}'
       - name: password
         value: '{$EMS.API.PASSWORD}'
+      - name: extended
+        value: '{$EMS.API.PERFMON.EXTENDED}'
       description: Experimental EMS 7.4.8 performance collection through the internal Grafana dashboard API.
       tags:
       - tag: component
@@ -815,6 +819,7 @@ zabbix_export:
       tags:
       - tag: component
         value: perfmon-api
+      status: DISABLED
     - uuid: 6e9747fe53f94e0483566c346ca2fa90
       name: 'Site {$EMS.API.SITE}: EMS nodes online'
       type: DEPENDENT
@@ -874,6 +879,7 @@ zabbix_export:
       - tag: component
         value: perfmon-api
       units: Bps
+      status: DISABLED
     - uuid: 95f7011a15f94261ac6e1f974788bfa6
       name: 'Site {$EMS.API.SITE}: Network send rate'
       type: DEPENDENT
@@ -894,6 +900,7 @@ zabbix_export:
       - tag: component
         value: perfmon-api
       units: Bps
+      status: DISABLED
     - uuid: 9f26dfe2f2344ad3ab1a3d3102c35e43
       name: 'Site {$EMS.API.SITE}: CPU cores'
       type: DEPENDENT
@@ -933,6 +940,7 @@ zabbix_export:
       tags:
       - tag: component
         value: perfmon-api
+      status: DISABLED
     - uuid: 5192350c772a4fd8974b8a260cc9a80c
       name: 'Site {$EMS.API.SITE}: Keep alive processing time'
       type: DEPENDENT
@@ -953,6 +961,7 @@ zabbix_export:
       - tag: component
         value: perfmon-api
       units: ms
+      status: DISABLED
     - uuid: d684df2bea854e0fb24f46181051a809
       name: 'Site {$EMS.API.SITE}: Keep alive records'
       type: DEPENDENT
@@ -972,6 +981,7 @@ zabbix_export:
       tags:
       - tag: component
         value: perfmon-api
+      status: DISABLED
     - uuid: 6ea9204e51274dcc89e3a31650254424
       name: 'Site {$EMS.API.SITE}: Highest EMS process CPU usage'
       type: DEPENDENT
@@ -992,6 +1002,7 @@ zabbix_export:
       - tag: component
         value: perfmon-api
       units: '%'
+      status: DISABLED
     - uuid: c93d0a0bac504e37aa8eb83fdab23144
       name: 'Site {$EMS.API.SITE}: Highest EMS process RAM usage'
       type: DEPENDENT
@@ -1012,6 +1023,7 @@ zabbix_export:
       - tag: component
         value: perfmon-api
       units: '%'
+      status: DISABLED
     - uuid: 201f25b1230248da8303cb603e75e748
       name: 'Site {$EMS.API.SITE}: Trial license'
       type: DEPENDENT
@@ -3285,6 +3297,9 @@ zabbix_export:
     - macro: '{$EMS.API.PERFMON.INTERVAL}'
       value: 5m
       description: Polling interval for perfmon API master item.
+    - macro: '{$EMS.API.PERFMON.EXTENDED}'
+      value: '0'
+      description: Set to 1 to query optional database, network, keep-alive and process diagnostic metrics.
     - macro: '{$EMS.API.ENDPOINTS.INTERVAL}'
       value: 10m
       description: Polling interval for endpoints API master item.
