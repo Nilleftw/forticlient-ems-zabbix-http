@@ -13,6 +13,8 @@ Create one Zabbix host per EMS site and set these host macros:
 | `{$EMS.API.USERNAME}` | EMS account with access to the selected site |
 | `{$EMS.API.PASSWORD}` | Password stored as **Secret text** |
 
+Item names show the resolved site name in Latest data. The template does not add a `site:{$EMS.API.SITE}` item tag because Zabbix displays user macros in item tags literally in that view. If site-based problem routing is needed, set a literal host tag such as `site:default` on each EMS host.
+
 The script normalizes an explicit default HTTPS port (`:443`) before setting the Origin and Referer headers. This avoids an EMS CSRF rejection observed with `https://host:443`.
 
 Each collection group has one Script master item and dependent metrics. **Disable a group's master item to stop its API requests.** Disabling a dependent item only stops storing that metric; its master still polls. Polling intervals are controlled by the corresponding `{$EMS.API.<GROUP>.INTERVAL}` template macro.
