@@ -3336,3 +3336,187 @@ zabbix_export:
     - macro: '{$EMS.API.PERFMON.DISK_WARN}'
       value: '90'
       description: Optional maximum disk usage warning threshold in percent.
+    dashboards:
+    - uuid: 5bede4bb4050448db04e4e06b087a844
+      name: 'EMS: Overview'
+      pages:
+      - name: Overview
+        widgets:
+        - type: item
+          name: EPP licenses used / allocated
+          x: '0'
+          width: '18'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.license.epp.summary
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: value_size
+            value: '34'
+        - type: item
+          name: ZTNA licenses used / allocated
+          x: '18'
+          width: '18'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.license.ztna.summary
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: value_size
+            value: '34'
+        - type: item
+          name: Online endpoints
+          x: '36'
+          width: '18'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.endpoints.online
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: value_size
+            value: '34'
+        - type: item
+          name: Server certificates expiring within 30 days
+          x: '54'
+          width: '18'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.certificates.server_expiring_30d
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: value_size
+            value: '34'
+        - type: svggraph
+          name: CPU utilization
+          x: '0'
+          y: '3'
+          width: '24'
+          height: '5'
+          fields:
+          - type: STRING
+            name: ds.0.color
+            value: 1976D2
+          - type: STRING
+            name: ds.0.items.0
+            value: ems.api.perfmon.cpu_pct
+          - type: STRING
+            name: reference
+            value: EMCPU
+          - type: STRING
+            name: time_period.from
+            value: now-1d
+          - type: INTEGER
+            name: legend_statistic
+            value: '1'
+        - type: svggraph
+          name: RAM utilization
+          x: '24'
+          y: '3'
+          width: '24'
+          height: '5'
+          fields:
+          - type: STRING
+            name: ds.0.color
+            value: 43A047
+          - type: STRING
+            name: ds.0.items.0
+            value: ems.api.perfmon.ram_pct
+          - type: STRING
+            name: reference
+            value: EMRAM
+          - type: STRING
+            name: time_period.from
+            value: now-1d
+          - type: INTEGER
+            name: legend_statistic
+            value: '1'
+        - type: svggraph
+          name: Highest disk utilization
+          x: '48'
+          y: '3'
+          width: '24'
+          height: '5'
+          fields:
+          - type: STRING
+            name: ds.0.color
+            value: F9A825
+          - type: STRING
+            name: ds.0.items.0
+            value: ems.api.perfmon.disk_max_pct
+          - type: STRING
+            name: reference
+            value: EMDSK
+          - type: STRING
+            name: time_period.from
+            value: now-1d
+          - type: INTEGER
+            name: legend_statistic
+            value: '1'
+        - type: svggraph
+          name: EPP license seats
+          x: '0'
+          y: '8'
+          width: '36'
+          height: '5'
+          fields:
+          - type: STRING
+            name: ds.0.color
+            value: 1976D2
+          - type: STRING
+            name: ds.0.items.0
+            value: ems.api.license.epp.used
+          - type: STRING
+            name: ds.1.color
+            value: 43A047
+          - type: STRING
+            name: ds.1.items.0
+            value: ems.api.license.epp.allocated
+          - type: STRING
+            name: reference
+            value: EMLIC
+          - type: STRING
+            name: time_period.from
+            value: now-1d
+          - type: INTEGER
+            name: legend_statistic
+            value: '1'
+        - type: problems
+          name: Problems
+          x: '36'
+          y: '8'
+          width: '36'
+          height: '5'
+          fields:
+          - type: STRING
+            name: reference
+            value: EMPRB
+          - type: INTEGER
+            name: show
+            value: '3'
+          - type: INTEGER
+            name: show_tags
+            value: '1'
