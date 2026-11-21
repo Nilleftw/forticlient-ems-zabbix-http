@@ -4,14 +4,14 @@ zabbix_export:
   - uuid: 02fdd4938b02498eac9bb7ccc7c703a0
     name: Templates/Network devices
   templates:
-  - uuid: ac47c814a17458bd8e2b3a47cbc0cbfe
+  - uuid: 094aee7a85fe43229b977daaa31d748c
     template: FortiClient EMS by HTTP
     name: FortiClient EMS by HTTP
     description: FortiClient EMS 7.4.8 license monitoring by site-specific HTTPS session API. One Zabbix host per EMS site; no SNMP dependency. No license triggers until verified in lab.
     groups:
     - name: Templates/Network devices
     items:
-    - uuid: 9790167c09195b42923e0927f9d5b0a6
+    - uuid: 685979695d344f30877527025b5ca584
       name: 'Site {$EMS.API.SITE}: API license data'
       type: SCRIPT
       key: ems.api.license.raw
@@ -112,7 +112,7 @@ zabbix_export:
         value: raw-api
       - tag: site
         value: '{$EMS.API.SITE}'
-    - uuid: d3d30dc1005a5c39b5d7091a2db8e01b
+    - uuid: 5242c57e21f14c1980048fbd68af559c
       name: 'Site {$EMS.API.SITE}: EPP Used'
       type: DEPENDENT
       key: ems.api.license.epp.used
@@ -135,7 +135,7 @@ zabbix_export:
         value: '{$EMS.API.SITE}'
       - tag: license_type
         value: EPP
-    - uuid: 290075571e9a5138b46e2da9abad0213
+    - uuid: 81f3bcb0be0a4de58ebb245e36776dca
       name: 'Site {$EMS.API.SITE}: EPP Allocated'
       type: DEPENDENT
       key: ems.api.license.epp.allocated
@@ -158,7 +158,7 @@ zabbix_export:
         value: '{$EMS.API.SITE}'
       - tag: license_type
         value: EPP
-    - uuid: 7a8cad5e8d225588ba2b90322ccfd857
+    - uuid: 36f42acc84dc4e0db09dc2971622ea5f
       name: 'Site {$EMS.API.SITE}: EPP Available'
       type: DEPENDENT
       key: ems.api.license.epp.available
@@ -181,7 +181,7 @@ zabbix_export:
         value: '{$EMS.API.SITE}'
       - tag: license_type
         value: EPP
-    - uuid: 190efc618f1451e4bcb08f8281200889
+    - uuid: d42e328464284b5d87cc107f4cb8e0f5
       name: 'Site {$EMS.API.SITE}: EPP Utilization'
       type: DEPENDENT
       key: ems.api.license.epp.utilization
@@ -205,7 +205,7 @@ zabbix_export:
       - tag: license_type
         value: EPP
       units: '%'
-    - uuid: a9311f4012505759a8b013f180489c9c
+    - uuid: 5e97e958772f4b93bbae3a0164058427
       name: 'Site {$EMS.API.SITE}: EPP Earliest expiry date'
       type: DEPENDENT
       key: ems.api.license.epp.expiry_date
@@ -229,7 +229,7 @@ zabbix_export:
       - tag: license_type
         value: EPP
       description: Earliest expiry_date for this license type; EMS returns a local timestamp without timezone. No expiry trigger until semantics are validated.
-    - uuid: 082a4b15fb7c5257a2d416a872ff4540
+    - uuid: 63d99ed15cc64e0bbb3c6349a898240f
       name: 'Site {$EMS.API.SITE}: EPP Summary'
       type: DEPENDENT
       key: ems.api.license.epp.summary
@@ -252,7 +252,7 @@ zabbix_export:
         value: '{$EMS.API.SITE}'
       - tag: license_type
         value: EPP
-    - uuid: 4dfbceb34211582e8570c22996ec0fb5
+    - uuid: d0fd47792649476098860a7bd712e141
       name: 'Site {$EMS.API.SITE}: ZTNA Used'
       type: DEPENDENT
       key: ems.api.license.ztna.used
@@ -275,7 +275,7 @@ zabbix_export:
         value: '{$EMS.API.SITE}'
       - tag: license_type
         value: ZTNA
-    - uuid: 082fd50ce46d5e26b5f6f7de0d241823
+    - uuid: 3ec549ea525e4b2e9b2022f654ef6184
       name: 'Site {$EMS.API.SITE}: ZTNA Allocated'
       type: DEPENDENT
       key: ems.api.license.ztna.allocated
@@ -298,7 +298,7 @@ zabbix_export:
         value: '{$EMS.API.SITE}'
       - tag: license_type
         value: ZTNA
-    - uuid: 41e0d518518d5e27a9ad8871696d1897
+    - uuid: 97f4efa784de4745b174abc22f9daf4f
       name: 'Site {$EMS.API.SITE}: ZTNA Available'
       type: DEPENDENT
       key: ems.api.license.ztna.available
@@ -321,7 +321,7 @@ zabbix_export:
         value: '{$EMS.API.SITE}'
       - tag: license_type
         value: ZTNA
-    - uuid: e734a66e4bf859ba8b337d6daa14aa1d
+    - uuid: a94befbcbf99430681f7c1a5741d1457
       name: 'Site {$EMS.API.SITE}: ZTNA Utilization'
       type: DEPENDENT
       key: ems.api.license.ztna.utilization
@@ -345,7 +345,7 @@ zabbix_export:
       - tag: license_type
         value: ZTNA
       units: '%'
-    - uuid: 8f794ce7118a534d8801bedd9a34fa21
+    - uuid: a011f810500a4706b58e9bb930dd4caa
       name: 'Site {$EMS.API.SITE}: ZTNA Earliest expiry date'
       type: DEPENDENT
       key: ems.api.license.ztna.expiry_date
@@ -369,7 +369,7 @@ zabbix_export:
       - tag: license_type
         value: ZTNA
       description: Earliest expiry_date for this license type; EMS returns a local timestamp without timezone. No expiry trigger until semantics are validated.
-    - uuid: 1edbf5fdef1b5745b80577a4cc6be8e6
+    - uuid: e2f6abbf53ac452ebbfabd31cf3d5eb1
       name: 'Site {$EMS.API.SITE}: ZTNA Summary'
       type: DEPENDENT
       key: ems.api.license.ztna.summary
