@@ -122,16 +122,18 @@ var wanted = {
     'System Overall CPU Usage (%)': 'cpu_pct',
     'RAM System Usage (%)': 'ram_pct',
     'Disk Space Usage (%)': 'disk_max_pct',
-    'DB Connections (totals)': 'db_connections',
     'EMS nodes online': 'ems_nodes_online',
-    'DB nodes latency (ms)': 'db_latency_max_ms',
-    'Real Time Network Traffic Rate': 'network',
-    'Network Connections': 'network_connections',
-    'Keep Alive Processing (ms)': 'keep_alive_ms',
-    'Keep Alive Processing (records)': 'keep_alive_records',
-    'EMS processes CPU usage': 'ems_process_cpu_max',
-    'EMS process RAM Usage (%)': 'ems_process_ram_max_pct'
+    'DB nodes latency (ms)': 'db_latency_max_ms'
 };
+if (String(p.extended) === '1') {
+    wanted['DB Connections (totals)'] = 'db_connections';
+    wanted['Real Time Network Traffic Rate'] = 'network';
+    wanted['Network Connections'] = 'network_connections';
+    wanted['Keep Alive Processing (ms)'] = 'keep_alive_ms';
+    wanted['Keep Alive Processing (records)'] = 'keep_alive_records';
+    wanted['EMS processes CPU usage'] = 'ems_process_cpu_max';
+    wanted['EMS process RAM Usage (%)'] = 'ems_process_ram_max_pct';
+}
 var queries = [], byRef = {};
 dto.spec.panels.forEach(function (panel) {
     var metric = wanted[panel.title];
