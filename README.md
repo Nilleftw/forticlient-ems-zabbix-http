@@ -32,16 +32,32 @@ All groups are enabled in the template so a new installation can inspect availab
 
 ## License discovery
 
-EPP and ZTNA retain their fixed item keys. Low-level discovery adds eight metrics for each other license type with used, allocated, future, or expired seats. Types with only zero values are omitted. The raw license item stores normalized counts and dates; EMS serial numbers and host IDs are discarded.
+EPP and ZTNA retain their fixed item keys. Low-level discovery adds nine metrics for each other license type with used, allocated, future, or expired seats. Types with only zero values are omitted. The raw license item stores normalized counts and dates; EMS serial numbers and host IDs are discarded. Expiry timestamps interpret EMS's timezone-free date as UTC and use `0` when no date is available.
+
+## Triggers
+
+The following triggers are enabled by default:
+
+| Condition | Severity | Default |
+|---|---|---|
+| No license API data for 20 minutes | High | Enabled |
+| EPP, ZTNA, or discovered license utilization reaches `{$EMS.API.LICENSE.WARN}` | Warning | 90% |
+| Allocated license expires within `{$EMS.API.LICENSE.EXPIRY_WARN_DAYS}` | Warning | 30 days |
+| Allocated license has expired | High | Enabled |
+| At least one server certificate expires within 30 calendar days | Warning | Enabled |
+| At least one server certificate has expired | High | Enabled |
+| Fewer live HA members than configured members | High | Enabled |
+
+Endpoint online percentage, critical vulnerabilities, and CPU/RAM/disk usage triggers are included but **disabled by default**. Enable them after setting thresholds appropriate to the environment. If the license master item is intentionally disabled, disable its no-data trigger as well. Zabbix notifications also require an action configured in Zabbix.
 
 ## Data handling and compatibility
 
-The template stores normalized monitoring values instead of raw EMS responses. This matters because some EMS API responses contain sensitive fields. Credentials and cookies remain inside a Script execution. No license or security triggers are enabled until thresholds are validated for more environments.
+The template stores normalized monitoring values instead of raw EMS responses. This matters because some EMS API responses contain sensitive fields. Credentials and cookies remain inside a Script execution. Default triggers focus on API availability, license capacity and expiry, server certificate expiry, and HA availability.
 
 The license, dashboard, and several other routes were observed in the EMS web interface; they are not all present in the supplied Fortinet OpenAPI files. See [API_COVERAGE.md](API_COVERAGE.md) for the routes used by each group. Performance collection uses EMS's internal Grafana endpoints and may need adjustments on other EMS versions. Certificate expiry comparisons use the date portion of the EMS response.
 
 ## Validation
 
-Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. All eight master items returned values. The license discovery created eight Chromebook items with correct values. In the lab, all 83 EMS API items received values and none were unsupported after discovery completed.
+Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. All eight master items returned values. The license discovery created nine Chromebook items with correct values. In the lab, all 86 EMS API items received values and none were unsupported after discovery completed. All trigger expressions imported and evaluated without errors; no default trigger was in problem state during validation.
 
 References: [Zabbix Script items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/script), [dependent items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/dependent_items), and [template import](https://www.zabbix.com/documentation/7.0/en/manual/api/reference/configuration/import).
