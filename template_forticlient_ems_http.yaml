@@ -3423,12 +3423,17 @@ zabbix_export:
           width: '24'
           height: '5'
           fields:
+          - type: INTEGER
+            name: ds.0.dataset_type
+            value: '0'
           - type: STRING
-            name: ds.0.color
+            name: ds.0.color.0
             value: 1976D2
-          - type: STRING
-            name: ds.0.items.0
-            value: ems.api.perfmon.cpu_pct
+          - type: ITEM
+            name: ds.0.itemids.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.perfmon.cpu_pct
           - type: STRING
             name: reference
             value: EMCPU
@@ -3448,12 +3453,17 @@ zabbix_export:
           width: '24'
           height: '5'
           fields:
+          - type: INTEGER
+            name: ds.0.dataset_type
+            value: '0'
           - type: STRING
-            name: ds.0.color
+            name: ds.0.color.0
             value: 43A047
-          - type: STRING
-            name: ds.0.items.0
-            value: ems.api.perfmon.ram_pct
+          - type: ITEM
+            name: ds.0.itemids.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.perfmon.ram_pct
           - type: STRING
             name: reference
             value: EMRAM
@@ -3473,12 +3483,17 @@ zabbix_export:
           width: '24'
           height: '5'
           fields:
+          - type: INTEGER
+            name: ds.0.dataset_type
+            value: '0'
           - type: STRING
-            name: ds.0.color
+            name: ds.0.color.0
             value: F9A825
-          - type: STRING
-            name: ds.0.items.0
-            value: ems.api.perfmon.disk_max_pct
+          - type: ITEM
+            name: ds.0.itemids.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.perfmon.disk_max_pct
           - type: STRING
             name: reference
             value: EMDSK
@@ -3498,18 +3513,25 @@ zabbix_export:
           width: '36'
           height: '5'
           fields:
+          - type: INTEGER
+            name: ds.0.dataset_type
+            value: '0'
           - type: STRING
-            name: ds.0.color
+            name: ds.0.color.0
             value: 1976D2
+          - type: ITEM
+            name: ds.0.itemids.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.license.epp.used
           - type: STRING
-            name: ds.0.items.0
-            value: ems.api.license.epp.used
-          - type: STRING
-            name: ds.1.color
+            name: ds.0.color.1
             value: 43A047
-          - type: STRING
-            name: ds.1.items.0
-            value: ems.api.license.epp.allocated
+          - type: ITEM
+            name: ds.0.itemids.1
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.license.epp.allocated
           - type: STRING
             name: reference
             value: EMLIC
