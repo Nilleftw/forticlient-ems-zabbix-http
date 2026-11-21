@@ -566,9 +566,7 @@ zabbix_export:
         var wanted = {
             'System Overall CPU Usage (%)': 'cpu_pct',
             'RAM System Usage (%)': 'ram_pct',
-            'Swap Usage (%)': 'swap_pct',
             'Disk Space Usage (%)': 'disk_max_pct',
-            'Online Endpoints': 'online_endpoints',
             'DB Connections (totals)': 'db_connections',
             'EMS nodes online': 'ems_nodes_online',
             'DB nodes latency (ms)': 'db_latency_max_ms',
@@ -615,8 +613,8 @@ zabbix_export:
             return null;
         }
         var output = {
-            cpu_pct: null, ram_pct: null, swap_pct: null, disk_max_pct: null,
-            online_endpoints: null, db_connections: null, ems_nodes_online: null,
+            cpu_pct: null, ram_pct: null, disk_max_pct: null,
+            db_connections: null, ems_nodes_online: null,
             db_latency_max_ms: null, net_recv_bps: null, net_sent_bps: null,
             network_connections: null, keep_alive_ms: null, keep_alive_records: null,
             ems_process_cpu_max: null, ems_process_ram_max_pct: null,
@@ -644,7 +642,7 @@ zabbix_export:
             if (metric === 'disk_max_pct' || metric === 'db_latency_max_ms' ||
                 metric === 'ems_process_cpu_max' || metric === 'ems_process_ram_max_pct')
                 output[metric] = Math.max.apply(null, numbers);
-            else if (metric === 'db_connections' || metric === 'ems_nodes_online' || metric === 'online_endpoints')
+            else if (metric === 'db_connections' || metric === 'ems_nodes_online')
                 output[metric] = numbers.reduce(function (a, b) { return a + b; }, 0);
             else output[metric] = numbers[0];
         });
@@ -661,6 +659,15 @@ zabbix_export:
       tags:
       - tag: component
         value: perfmon-api
+      triggers:
+      - uuid: 4d0da9a3e0c8442d9393fd687633da24
+        expression: nodata(/FortiClient EMS by HTTP/ems.api.perfmon.raw,20m)=1
+        name: 'EMS: Performance API has no data'
+        priority: HIGH
+        description: Performance polling has returned no value for 20 minutes. Disable this trigger if the Performance master item is intentionally disabled.
+        tags:
+        - tag: component
+          value: perfmon-api
     - uuid: eabb0d33d95043b092d3fe6590e62260
       name: 'Site {$EMS.API.SITE}: Overall CPU usage'
       type: DEPENDENT
@@ -690,7 +697,6 @@ zabbix_export:
         tags:
         - tag: component
           value: perfmon-api
-        status: DISABLED
     - uuid: 29be48228dd54bc4a85fffc813f01149
       name: 'Site {$EMS.API.SITE}: RAM system usage'
       type: DEPENDENT
@@ -720,7 +726,6 @@ zabbix_export:
         tags:
         - tag: component
           value: perfmon-api
-        status: DISABLED
     - uuid: 4a40b59bbf694b3fb04a51237bd4547b
       name: 'Site {$EMS.API.SITE}: Swap usage'
       type: DEPENDENT
@@ -741,6 +746,7 @@ zabbix_export:
       - tag: component
         value: perfmon-api
       units: '%'
+      status: DISABLED
     - uuid: 0f4f24decae44f038274ec1c6e199085
       name: 'Site {$EMS.API.SITE}: Highest disk usage'
       type: DEPENDENT
@@ -770,7 +776,6 @@ zabbix_export:
         tags:
         - tag: component
           value: perfmon-api
-        status: DISABLED
     - uuid: 52afb9020b2d4098875ef50ad61eb7b6
       name: 'Site {$EMS.API.SITE}: Online endpoints'
       type: DEPENDENT
@@ -790,6 +795,7 @@ zabbix_export:
       tags:
       - tag: component
         value: perfmon-api
+      status: DISABLED
     - uuid: 118cea459fac425da202e9a72b842d79
       name: 'Site {$EMS.API.SITE}: Database connections'
       type: DEPENDENT
@@ -907,6 +913,7 @@ zabbix_export:
       tags:
       - tag: component
         value: perfmon-api
+      status: DISABLED
     - uuid: bf1bd92c4bfe4a7fb50c22c62c5d084e
       name: 'Site {$EMS.API.SITE}: Established network connections'
       type: DEPENDENT
@@ -1807,6 +1814,15 @@ zabbix_export:
         value: security-api
       - tag: scope
         value: site
+      triggers:
+      - uuid: f36510c11d0643fc94767c78ee31f4f8
+        expression: last(/FortiClient EMS by HTTP/ems.api.security.profile_errors)>0
+        name: 'Site {$EMS.API.SITE}: EMS profile errors detected'
+        priority: WARNING
+        description: EMS reports at least one profile configuration error.
+        tags:
+        - tag: component
+          value: security-api
     - uuid: 343c33d3913f43bdaf33e7ff858c3cd2
       name: 'Site {$EMS.API.SITE}: Zero Trust tag errors'
       type: DEPENDENT
@@ -1826,6 +1842,15 @@ zabbix_export:
         value: security-api
       - tag: scope
         value: site
+      triggers:
+      - uuid: 0592d2998b2d4a57a571576ba938eacb
+        expression: last(/FortiClient EMS by HTTP/ems.api.security.zero_trust_tag_errors)>0
+        name: 'Site {$EMS.API.SITE}: Zero Trust tag errors detected'
+        priority: WARNING
+        description: EMS reports at least one Zero Trust tag error.
+        tags:
+        - tag: component
+          value: security-api
     - uuid: e56ca120316b42ad9106bffee995d77c
       name: 'Site {$EMS.API.SITE}: Active forensic tasks'
       type: DEPENDENT
@@ -2369,6 +2394,7 @@ zabbix_export:
         value: raw-alerts-api
       - tag: scope
         value: site
+      status: DISABLED
     - uuid: 2a7e7675e15c42fca3921127f5295705
       name: 'Site {$EMS.API.SITE}: Alerts'
       type: DEPENDENT
@@ -2388,6 +2414,7 @@ zabbix_export:
         value: alerts-api
       - tag: scope
         value: site
+      status: DISABLED
     - uuid: 27c69866195e41e7bf9ec66d181ded49
       name: 'Site {$EMS.API.SITE}: Unread alerts for API account'
       type: DEPENDENT
@@ -2407,6 +2434,7 @@ zabbix_export:
         value: alerts-api
       - tag: scope
         value: site
+      status: DISABLED
     - uuid: 5db3eb8625a54bdf948c4dc11279c78e
       name: 'Site {$EMS.API.SITE}: Certificates API data'
       type: SCRIPT
@@ -2598,6 +2626,15 @@ zabbix_export:
         value: raw-certificates-api
       - tag: scope
         value: global
+      triggers:
+      - uuid: f0a8824234df4fc780212f43b496ad3b
+        expression: nodata(/FortiClient EMS by HTTP/ems.api.certificates.raw,3h)=1
+        name: 'EMS: Certificate API has no data'
+        priority: HIGH
+        description: Certificate polling has returned no value for three hours. Disable this trigger if the Certificates master item is intentionally disabled.
+        tags:
+        - tag: component
+          value: certificates-api
     - uuid: 3b78e0f3ecac49f29d24350f2d15e26e
       name: 'Site {$EMS.API.SITE}: Server certificates'
       type: DEPENDENT
@@ -2902,6 +2939,7 @@ zabbix_export:
         value: raw-inventory-api
       - tag: scope
         value: global
+      status: DISABLED
     - uuid: 8d17125c0e884fd182c2f4f0928acf1e
       name: 'Site {$EMS.API.SITE}: EMS sites'
       type: DEPENDENT
@@ -2921,6 +2959,7 @@ zabbix_export:
         value: inventory-api
       - tag: scope
         value: global
+      status: DISABLED
     - uuid: c987d380c42543e2b16de636de33621e
       name: 'Site {$EMS.API.SITE}: Workgroups'
       type: DEPENDENT
@@ -2940,6 +2979,7 @@ zabbix_export:
         value: inventory-api
       - tag: scope
         value: global
+      status: DISABLED
     - uuid: a706982275f842a9a4185ba228aadb42
       name: 'Site {$EMS.API.SITE}: EPP expiry timestamp'
       type: DEPENDENT
