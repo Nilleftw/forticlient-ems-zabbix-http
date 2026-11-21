@@ -473,11 +473,22 @@ zabbix_export:
             throw 'EMS perfmon could not select global session';
         captureCookies();
 
-        headers(false, true);
-        req.post(base + '/api/v1/performance_dashboard/login', '');
-        if (req.getStatus() === 403)
-            throw 'EMS perfmon Grafana login HTTP 403 (CSRF cookie ' +
-                (csrf ? 'present' : 'missing') + '; check EMS account Performance permission)';
+        headers(false, false);
+        var grafanaLoginBody = req.post(base + '/api/v1/performance_dashboard/login', '');
+        if (req.getStatus() === 403) {
+            var reason = 'unclassified';
+            var detail = String(grafanaLoginBody || '');
+            try {
+                var errorResponse = JSON.parse(detail);
+                detail = String((errorResponse.result && errorResponse.result.message) ||
+                    errorResponse.message || errorResponse.error || '');
+            } catch (ignored) {}
+            if (/csrf|cross.site|origin|referer/i.test(detail)) reason = 'CSRF or origin rejected';
+            else if (/permission|privilege|forbidden|access.denied/i.test(detail)) reason = 'permission denied';
+            else if (/session|authenticat|login|credential/i.test(detail)) reason = 'session rejected';
+            throw 'EMS perfmon Grafana login HTTP 403 (' + reason +
+                '; CSRF cookie ' + (csrf ? 'present' : 'missing') + ')';
+        }
         checked(200, 'Grafana login');
         captureCookies();
 
