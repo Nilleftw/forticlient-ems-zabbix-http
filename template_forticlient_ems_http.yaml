@@ -149,8 +149,6 @@ zabbix_export:
       tags:
       - tag: component
         value: raw-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       triggers:
       - uuid: bd8bbd2dedf04429a408d5726f21eea8
         expression: nodata(/FortiClient EMS by HTTP/ems.api.license.raw,20m)=1
@@ -179,8 +177,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: EPP
     - uuid: 81f3bcb0be0a4de58ebb245e36776dca
@@ -202,8 +198,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: EPP
     - uuid: 36f42acc84dc4e0db09dc2971622ea5f
@@ -225,8 +219,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: EPP
     - uuid: d42e328464284b5d87cc107f4cb8e0f5
@@ -248,8 +240,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: EPP
       units: '%'
@@ -282,8 +272,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: EPP
       description: Earliest expiry_date for this license type; EMS returns a local timestamp without timezone. No expiry trigger until semantics are validated.
@@ -306,8 +294,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: EPP
     - uuid: d0fd47792649476098860a7bd712e141
@@ -329,8 +315,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: ZTNA
     - uuid: 3ec549ea525e4b2e9b2022f654ef6184
@@ -352,8 +336,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: ZTNA
     - uuid: 97f4efa784de4745b174abc22f9daf4f
@@ -375,8 +357,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: ZTNA
     - uuid: a94befbcbf99430681f7c1a5741d1457
@@ -398,8 +378,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: ZTNA
       units: '%'
@@ -432,8 +410,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: ZTNA
       description: Earliest expiry_date for this license type; EMS returns a local timestamp without timezone. No expiry trigger until semantics are validated.
@@ -456,8 +432,6 @@ zabbix_export:
       tags:
       - tag: component
         value: license-api
-      - tag: site
-        value: '{$EMS.API.SITE}'
       - tag: license_type
         value: ZTNA
     - uuid: 36e410957e30446aa79e7bb9392bac26
@@ -1050,8 +1024,6 @@ zabbix_export:
         value: license-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 86b078a104e9480b860ed913e5d85a28
       name: 'Site {$EMS.API.SITE}: EPP Total'
       type: DEPENDENT
@@ -1071,8 +1043,6 @@ zabbix_export:
         value: license-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 0be609273221495a966ba2b857ff2e70
       name: 'Site {$EMS.API.SITE}: EPP Future'
       type: DEPENDENT
@@ -1092,8 +1062,6 @@ zabbix_export:
         value: license-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 17df1a56ca0f4eef9854f8ee5218d4e4
       name: 'Site {$EMS.API.SITE}: EPP Expired'
       type: DEPENDENT
@@ -1113,8 +1081,6 @@ zabbix_export:
         value: license-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: a1a531368b1d4f308b0728c358e780c5
       name: 'Site {$EMS.API.SITE}: ZTNA Total'
       type: DEPENDENT
@@ -1134,8 +1100,6 @@ zabbix_export:
         value: license-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: f6c593c5723446719f02c8077400871f
       name: 'Site {$EMS.API.SITE}: ZTNA Future'
       type: DEPENDENT
@@ -1155,8 +1119,6 @@ zabbix_export:
         value: license-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 25e12a2f11b54a19902bb0053dfebc41
       name: 'Site {$EMS.API.SITE}: ZTNA Expired'
       type: DEPENDENT
@@ -1176,8 +1138,6 @@ zabbix_export:
         value: license-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 4f50fd3361aa4e2d847e8f86c381b643
       name: 'Site {$EMS.API.SITE}: Endpoints API data'
       type: SCRIPT
@@ -1369,8 +1329,6 @@ zabbix_export:
         value: raw-endpoints-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 747f398508a649e18e9411d25db12a74
       name: 'Site {$EMS.API.SITE}: Total endpoints'
       type: DEPENDENT
@@ -1390,8 +1348,6 @@ zabbix_export:
         value: endpoints-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 8e50a2bd3b57409287f3a954f265ccc1
       name: 'Site {$EMS.API.SITE}: Online endpoints'
       type: DEPENDENT
@@ -1411,8 +1367,6 @@ zabbix_export:
         value: endpoints-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: dc12a09e3eb946668a4c79c8f10347aa
       name: 'Site {$EMS.API.SITE}: Online endpoints utilization'
       type: DEPENDENT
@@ -1432,8 +1386,6 @@ zabbix_export:
         value: endpoints-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
       units: '%'
       triggers:
       - uuid: 48328e40a61e4e52b98ec7804fc64cb7
@@ -1464,8 +1416,6 @@ zabbix_export:
         value: endpoints-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: a312be2b88e94597a338bd1666ca49e3
       name: 'Site {$EMS.API.SITE}: Recently offline endpoints'
       type: DEPENDENT
@@ -1485,8 +1435,6 @@ zabbix_export:
         value: endpoints-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 4e6e3b1d280c4288aa28f6959622494f
       name: 'Site {$EMS.API.SITE}: Nominally offline endpoints'
       type: DEPENDENT
@@ -1506,8 +1454,6 @@ zabbix_export:
         value: endpoints-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 2222be42dba04f8ba73ceb97208f034e
       name: 'Site {$EMS.API.SITE}: Long-term offline endpoints'
       type: DEPENDENT
@@ -1527,8 +1473,6 @@ zabbix_export:
         value: endpoints-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: fbd0110470084435aa7b70c216c72c4d
       name: 'Site {$EMS.API.SITE}: Managed endpoints'
       type: DEPENDENT
@@ -1548,8 +1492,6 @@ zabbix_export:
         value: endpoints-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 756722b7d60c41b3813c3501e3462cac
       name: 'Site {$EMS.API.SITE}: Unmanaged endpoints'
       type: DEPENDENT
@@ -1569,8 +1511,6 @@ zabbix_export:
         value: endpoints-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: eb1aba03a6c741ab8da4e95d9493ea90
       name: 'Site {$EMS.API.SITE}: Security API data'
       type: SCRIPT
@@ -1762,8 +1702,6 @@ zabbix_export:
         value: raw-security-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 2a74f996497b4991b8ec2737dcc6bf03
       name: 'Site {$EMS.API.SITE}: Vulnerabilities'
       type: DEPENDENT
@@ -1783,8 +1721,6 @@ zabbix_export:
         value: security-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 84d51e2564104429a74cfe27d1b800bb
       name: 'Site {$EMS.API.SITE}: High vulnerabilities'
       type: DEPENDENT
@@ -1804,8 +1740,6 @@ zabbix_export:
         value: security-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 27f3cc4c9c614332b48c4dae5f0c0b43
       name: 'Site {$EMS.API.SITE}: Critical vulnerabilities'
       type: DEPENDENT
@@ -1825,8 +1759,6 @@ zabbix_export:
         value: security-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
       triggers:
       - uuid: 0c0dff83ffeb49729d038d0f38121d47
         expression: last(/FortiClient EMS by HTTP/ems.api.security.critical_vulnerabilities)>0
@@ -1856,8 +1788,6 @@ zabbix_export:
         value: security-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: a9ef25f9307f48c3b3a60d502132032a
       name: 'Site {$EMS.API.SITE}: Profile errors'
       type: DEPENDENT
@@ -1877,8 +1807,6 @@ zabbix_export:
         value: security-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 343c33d3913f43bdaf33e7ff858c3cd2
       name: 'Site {$EMS.API.SITE}: Zero Trust tag errors'
       type: DEPENDENT
@@ -1898,8 +1826,6 @@ zabbix_export:
         value: security-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: e56ca120316b42ad9106bffee995d77c
       name: 'Site {$EMS.API.SITE}: Active forensic tasks'
       type: DEPENDENT
@@ -1919,8 +1845,6 @@ zabbix_export:
         value: security-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 89c6390a526b4d90ad4cda98c7d05312
       name: 'Site {$EMS.API.SITE}: System API data'
       type: SCRIPT
@@ -2112,8 +2036,6 @@ zabbix_export:
         value: raw-system-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 9c45a7ef47094a6eaeec4dcb31de5fd0
       name: 'Site {$EMS.API.SITE}: HA members'
       type: DEPENDENT
@@ -2133,8 +2055,6 @@ zabbix_export:
         value: system-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 1f4412d1764843e68c00ce368721604e
       name: 'Site {$EMS.API.SITE}: Alive HA members'
       type: DEPENDENT
@@ -2154,8 +2074,6 @@ zabbix_export:
         value: system-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
       triggers:
       - uuid: d064c3f54bb54546964223085670ee5a
         expression: last(/FortiClient EMS by HTTP/ems.api.system.ha_members)>0 and last(/FortiClient EMS by HTTP/ems.api.system.ha_alive)<last(/FortiClient EMS by HTTP/ems.api.system.ha_members)
@@ -2184,8 +2102,6 @@ zabbix_export:
         value: system-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 679051bc98664a1e8d321d0f6829038d
       name: 'Site {$EMS.API.SITE}: Signatures updating'
       type: DEPENDENT
@@ -2205,8 +2121,6 @@ zabbix_export:
         value: system-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: beba8b25048b4187b16812277e98f591
       name: 'Site {$EMS.API.SITE}: Upgrade available'
       type: DEPENDENT
@@ -2226,8 +2140,6 @@ zabbix_export:
         value: system-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 534b0f67544942b3a158610aa87750a5
       name: 'Site {$EMS.API.SITE}: Available upgrade version'
       type: DEPENDENT
@@ -2247,8 +2159,6 @@ zabbix_export:
         value: system-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 9f8659d0552942e886248486993f7a8b
       name: 'Site {$EMS.API.SITE}: Repackager available'
       type: DEPENDENT
@@ -2268,8 +2178,6 @@ zabbix_export:
         value: system-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 8846d80b3eab4a46bc911db96e151a78
       name: 'Site {$EMS.API.SITE}: Alerts API data'
       type: SCRIPT
@@ -2461,8 +2369,6 @@ zabbix_export:
         value: raw-alerts-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 2a7e7675e15c42fca3921127f5295705
       name: 'Site {$EMS.API.SITE}: Alerts'
       type: DEPENDENT
@@ -2482,8 +2388,6 @@ zabbix_export:
         value: alerts-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 27c69866195e41e7bf9ec66d181ded49
       name: 'Site {$EMS.API.SITE}: Unread alerts for API account'
       type: DEPENDENT
@@ -2503,8 +2407,6 @@ zabbix_export:
         value: alerts-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 5db3eb8625a54bdf948c4dc11279c78e
       name: 'Site {$EMS.API.SITE}: Certificates API data'
       type: SCRIPT
@@ -2696,8 +2598,6 @@ zabbix_export:
         value: raw-certificates-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 3b78e0f3ecac49f29d24350f2d15e26e
       name: 'Site {$EMS.API.SITE}: Server certificates'
       type: DEPENDENT
@@ -2717,8 +2617,6 @@ zabbix_export:
         value: certificates-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 8655afb38cb34f39b245318514d6f7b8
       name: 'Site {$EMS.API.SITE}: Client certificates'
       type: DEPENDENT
@@ -2738,8 +2636,6 @@ zabbix_export:
         value: certificates-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 8ad2fe56390d4235bdbe3d59bb9aa7a4
       name: 'Site {$EMS.API.SITE}: Expired server certificates'
       type: DEPENDENT
@@ -2759,8 +2655,6 @@ zabbix_export:
         value: certificates-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
       triggers:
       - uuid: deef1ba7e73d4ec2971449c610ff04ed
         expression: last(/FortiClient EMS by HTTP/ems.api.certificates.server_expired)>0
@@ -2789,8 +2683,6 @@ zabbix_export:
         value: certificates-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
       triggers:
       - uuid: 9bac7da350ea466689f21b8229940f88
         expression: last(/FortiClient EMS by HTTP/ems.api.certificates.server_expiring_30d)>0
@@ -2819,8 +2711,6 @@ zabbix_export:
         value: certificates-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 7607452908604d07bea70513848f8fae
       name: 'Site {$EMS.API.SITE}: Inventory API data'
       type: SCRIPT
@@ -3012,8 +2902,6 @@ zabbix_export:
         value: raw-inventory-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: 8d17125c0e884fd182c2f4f0928acf1e
       name: 'Site {$EMS.API.SITE}: EMS sites'
       type: DEPENDENT
@@ -3033,8 +2921,6 @@ zabbix_export:
         value: inventory-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: c987d380c42543e2b16de636de33621e
       name: 'Site {$EMS.API.SITE}: Workgroups'
       type: DEPENDENT
@@ -3054,8 +2940,6 @@ zabbix_export:
         value: inventory-api
       - tag: scope
         value: global
-      - tag: site
-        value: '{$EMS.API.SITE}'
     - uuid: a706982275f842a9a4185ba228aadb42
       name: 'Site {$EMS.API.SITE}: EPP expiry timestamp'
       type: DEPENDENT
@@ -3075,8 +2959,6 @@ zabbix_export:
         value: license-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
       units: unixtime
       triggers:
       - uuid: 3ae250343baf44148564913cf9c7ef83
@@ -3114,8 +2996,6 @@ zabbix_export:
         value: license-api
       - tag: scope
         value: site
-      - tag: site
-        value: '{$EMS.API.SITE}'
       units: unixtime
       triggers:
       - uuid: fb49688d31574109911037d9fb5c19c7
@@ -3164,8 +3044,6 @@ zabbix_export:
         tags:
         - tag: component
           value: license-api
-        - tag: site
-          value: '{$EMS.API.SITE}'
         - tag: license_type
           value: '{#LICENSE_TYPE}'
       - uuid: 0e77c83e644e429eb112585e2a5fb7ce
@@ -3185,8 +3063,6 @@ zabbix_export:
         tags:
         - tag: component
           value: license-api
-        - tag: site
-          value: '{$EMS.API.SITE}'
         - tag: license_type
           value: '{#LICENSE_TYPE}'
       - uuid: 2ba314081bec4100bbe00d9c11bac666
@@ -3206,8 +3082,6 @@ zabbix_export:
         tags:
         - tag: component
           value: license-api
-        - tag: site
-          value: '{$EMS.API.SITE}'
         - tag: license_type
           value: '{#LICENSE_TYPE}'
       - uuid: 8256fea006804d14acb958c42f07092e
@@ -3227,8 +3101,6 @@ zabbix_export:
         tags:
         - tag: component
           value: license-api
-        - tag: site
-          value: '{$EMS.API.SITE}'
         - tag: license_type
           value: '{#LICENSE_TYPE}'
         units: '%'
@@ -3249,8 +3121,6 @@ zabbix_export:
         tags:
         - tag: component
           value: license-api
-        - tag: site
-          value: '{$EMS.API.SITE}'
         - tag: license_type
           value: '{#LICENSE_TYPE}'
       - uuid: 8dc4e00c506840b286c18afba3d2dd5d
@@ -3270,8 +3140,6 @@ zabbix_export:
         tags:
         - tag: component
           value: license-api
-        - tag: site
-          value: '{$EMS.API.SITE}'
         - tag: license_type
           value: '{#LICENSE_TYPE}'
       - uuid: b730b91dc48b49cb8ecde310a2aa8255
@@ -3291,8 +3159,6 @@ zabbix_export:
         tags:
         - tag: component
           value: license-api
-        - tag: site
-          value: '{$EMS.API.SITE}'
         - tag: license_type
           value: '{#LICENSE_TYPE}'
       - uuid: 77c4cedde1114a20a7de781867891400
@@ -3312,8 +3178,6 @@ zabbix_export:
         tags:
         - tag: component
           value: license-api
-        - tag: site
-          value: '{$EMS.API.SITE}'
         - tag: license_type
           value: '{#LICENSE_TYPE}'
       - uuid: 323840cbfbed412484bf6197c5455a15
@@ -3333,8 +3197,6 @@ zabbix_export:
         tags:
         - tag: component
           value: license-api
-        - tag: site
-          value: '{$EMS.API.SITE}'
         - tag: license_type
           value: '{#LICENSE_TYPE}'
         units: unixtime
