@@ -3,7 +3,7 @@ var base = p.base_url.replace(/\/$/, '');
 if (!/^https:\/\/[^/]+$/.test(base) || !p.username || !p.password)
     throw 'Invalid EMS perfmon parameters';
 
-var req = new HttpRequest();
+var req;
 var cookies = {};
 var csrf = '';
 function captureCookies() {
@@ -23,20 +23,21 @@ function captureCookies() {
     });
 }
 function headers(grafana, json) {
-    req.clearHeader();
-    req.addHeader('Accept: application/json');
-    if (json) req.addHeader('Content-Type: application/json');
+    var r = new HttpRequest();
+    r.addHeader('Accept: application/json');
+    if (json) r.addHeader('Content-Type: application/json');
     if (!grafana) {
-        req.addHeader('EMS-Call-Type: 2');
-        if (csrf) req.addHeader('X-CSRFToken: ' + csrf);
+        r.addHeader('EMS-Call-Type: 2');
+        if (csrf) r.addHeader('X-CSRFToken: ' + csrf);
     } else {
-        req.addHeader('X-Grafana-Org-Id: ' + org);
+        r.addHeader('X-Grafana-Org-Id: ' + org);
     }
-    req.addHeader('Origin: ' + base);
+    r.addHeader('Origin: ' + base);
     var pairs = [];
     Object.keys(cookies).forEach(function (key) { pairs.push(key + '=' + cookies[key]); });
-    if (pairs.length) req.addHeader('Cookie: ' + pairs.join('; '));
-    req.addHeader('Referer: ' + base + '/');
+    if (pairs.length) r.addHeader('Cookie: ' + pairs.join('; '));
+    r.addHeader('Referer: ' + base + '/');
+    return r;
 }
 function checked(status, operation) {
     if (req.getStatus() !== status) throw 'EMS perfmon ' + operation + ' HTTP ' + req.getStatus();
@@ -46,7 +47,7 @@ function parsed(body, operation) {
     catch (e) { throw 'EMS perfmon ' + operation + ' returned invalid JSON'; }
 }
 var org = '1';
-headers(false, true);
+req = headers(false, true);
 req.post(base + '/api/v1/auth/signin', JSON.stringify({
     name: p.username, password: p.password
 }));
@@ -54,12 +55,12 @@ checked(200, 'signin');
 captureCookies();
 if (!Object.keys(cookies).length) throw 'EMS perfmon signin returned no session cookie';
 
-headers(false, false);
+req = headers(false, false);
 req.get(base + '/api/v1/session/check');
 checked(200, 'session check');
 captureCookies();
 
-headers(false, true);
+req = headers(false, true);
 var sessionUpdateBody = req.post(base + '/api/v1/session/update',
     JSON.stringify({site: null}));
 checked(200, 'global session selection');
@@ -68,7 +69,7 @@ if (!sessionUpdate.result || Number(sessionUpdate.result.retval) !== 1)
     throw 'EMS perfmon could not select global session';
 captureCookies();
 
-headers(false, false);
+req = headers(false, false);
 var grafanaLoginBody = req.post(base + '/api/v1/performance_dashboard/login', '');
 if (req.getStatus() === 403) {
     var reason = 'unclassified';
@@ -87,7 +88,7 @@ if (req.getStatus() === 403) {
 checked(200, 'Grafana login');
 captureCookies();
 
-headers(false, false);
+req = headers(false, false);
 var search = parsed(req.get(base + '/api/v1/performance_dashboard/dashboard_search?from=now-5m&to=now'), 'dashboard search');
 checked(200, 'dashboard search');
 if (!search.data || !Array.isArray(search.data) || !search.data.length)
@@ -99,7 +100,7 @@ if (!/^[A-Za-z0-9_.-]+$/.test(host)) throw 'EMS perfmon returned invalid host na
 var uid = panels[0].uid;
 if (!/^[A-Za-z0-9_-]+$/.test(uid)) throw 'EMS perfmon returned invalid dashboard UID';
 
-headers(true, false);
+req = headers(true, false);
 var dto = parsed(req.get(base + '/grafana/apis/dashboard.grafana.app/v1beta1/namespaces/default/dashboards/' + uid + '/dto'), 'dashboard definition');
 checked(200, 'dashboard definition');
 if (!dto.spec || !Array.isArray(dto.spec.panels)) throw 'EMS perfmon dashboard definition changed';
@@ -136,7 +137,7 @@ dto.spec.panels.forEach(function (panel) {
     byRef[ref] = metric;
 });
 if (!queries.length) throw 'EMS perfmon dashboard has no usable queries';
-headers(true, true);
+req = headers(true, true);
 var result = parsed(req.post(base + '/grafana/api/ds/query',
     JSON.stringify({queries: queries, from: 'now-5m', to: 'now'})), 'data query');
 checked(200, 'data query');
