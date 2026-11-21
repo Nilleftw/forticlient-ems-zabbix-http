@@ -100,6 +100,9 @@ zabbix_export:
                         expiration = entry.expiry_date;
                 });
                 var pct = allocated > 0 ? 100 * used / allocated : null;
+                var expiryEpoch = expiration === null ? 0 : Math.floor(Date.parse(expiration + 'Z') / 1000);
+                if (!isFinite(expiryEpoch) || expiryEpoch < 0)
+                    throw 'Invalid EMS license expiry date: ' + kind;
                 return {
                     used: used,
                     allocated: allocated,
@@ -109,6 +112,7 @@ zabbix_export:
                     available: Math.max(0, allocated - used),
                     utilization: pct,
                     expiry_date: expiration,
+                    expiry_epoch: expiryEpoch,
                     summary: used + ' / ' + allocated + ' (' + (pct === null ? 'n/a' : pct.toFixed(2) + '%') + ')'
                 };
             }
@@ -147,6 +151,15 @@ zabbix_export:
         value: raw-api
       - tag: site
         value: '{$EMS.API.SITE}'
+      triggers:
+      - uuid: bd8bbd2dedf04429a408d5726f21eea8
+        expression: nodata(/FortiClient EMS by HTTP/ems.api.license.raw,20m)=1
+        name: 'Site {$EMS.API.SITE}: EMS license API has no data'
+        priority: HIGH
+        description: License API polling has returned no value for 20 minutes.
+        tags:
+        - tag: component
+          value: license-api
     - uuid: 5242c57e21f14c1980048fbd68af559c
       name: 'Site {$EMS.API.SITE}: EPP Used'
       type: DEPENDENT
@@ -241,6 +254,15 @@ zabbix_export:
         value: EPP
       units: '%'
       description: Reports 0 when no seats are allocated so the numeric item remains supported. Check Allocated or Summary to distinguish unlicensed from unused seats.
+      triggers:
+      - uuid: 89e145da73da42c48fceb92be760190e
+        expression: last(/FortiClient EMS by HTTP/ems.api.license.epp.allocated)>0 and last(/FortiClient EMS by HTTP/ems.api.license.epp.utilization)>={$EMS.API.LICENSE.WARN}
+        name: 'Site {$EMS.API.SITE}: EPP license utilization is high'
+        priority: WARNING
+        description: Active site allocation has reached the configured utilization threshold.
+        tags:
+        - tag: component
+          value: license-api
     - uuid: 5e97e958772f4b93bbae3a0164058427
       name: 'Site {$EMS.API.SITE}: EPP Earliest expiry date'
       type: DEPENDENT
@@ -382,6 +404,15 @@ zabbix_export:
         value: ZTNA
       units: '%'
       description: Reports 0 when no seats are allocated so the numeric item remains supported. Check Allocated or Summary to distinguish unlicensed from unused seats.
+      triggers:
+      - uuid: 41e72d05a2124bf2aa16e39b7fb45e01
+        expression: last(/FortiClient EMS by HTTP/ems.api.license.ztna.allocated)>0 and last(/FortiClient EMS by HTTP/ems.api.license.ztna.utilization)>={$EMS.API.LICENSE.WARN}
+        name: 'Site {$EMS.API.SITE}: ZTNA license utilization is high'
+        priority: WARNING
+        description: Active site allocation has reached the configured utilization threshold.
+        tags:
+        - tag: component
+          value: license-api
     - uuid: a011f810500a4706b58e9bb930dd4caa
       name: 'Site {$EMS.API.SITE}: ZTNA Earliest expiry date'
       type: DEPENDENT
@@ -676,6 +707,16 @@ zabbix_export:
       - tag: component
         value: perfmon-api
       units: '%'
+      triggers:
+      - uuid: d3534974287f41fa99b0dafb3f8bf9bf
+        expression: avg(/FortiClient EMS by HTTP/ems.api.perfmon.cpu_pct,15m)>{$EMS.API.PERFMON.CPU_WARN}
+        name: 'EMS: CPU utilization is high'
+        priority: WARNING
+        description: Disabled by default; enable after confirming thresholds for this EMS host.
+        tags:
+        - tag: component
+          value: perfmon-api
+        status: DISABLED
     - uuid: 29be48228dd54bc4a85fffc813f01149
       name: 'Site {$EMS.API.SITE}: RAM system usage'
       type: DEPENDENT
@@ -696,6 +737,16 @@ zabbix_export:
       - tag: component
         value: perfmon-api
       units: '%'
+      triggers:
+      - uuid: 59745aab7c874b4eb28e58f109ae711d
+        expression: avg(/FortiClient EMS by HTTP/ems.api.perfmon.ram_pct,15m)>{$EMS.API.PERFMON.RAM_WARN}
+        name: 'EMS: RAM utilization is high'
+        priority: WARNING
+        description: Disabled by default; enable after confirming thresholds for this EMS host.
+        tags:
+        - tag: component
+          value: perfmon-api
+        status: DISABLED
     - uuid: 4a40b59bbf694b3fb04a51237bd4547b
       name: 'Site {$EMS.API.SITE}: Swap usage'
       type: DEPENDENT
@@ -736,6 +787,16 @@ zabbix_export:
       - tag: component
         value: perfmon-api
       units: '%'
+      triggers:
+      - uuid: 0d748bd392774859919cdef10f4949a9
+        expression: avg(/FortiClient EMS by HTTP/ems.api.perfmon.disk_max_pct,15m)>{$EMS.API.PERFMON.DISK_WARN}
+        name: 'EMS: disk utilization is high'
+        priority: WARNING
+        description: Disabled by default; enable after confirming thresholds for this EMS host.
+        tags:
+        - tag: component
+          value: perfmon-api
+        status: DISABLED
     - uuid: 52afb9020b2d4098875ef50ad61eb7b6
       name: 'Site {$EMS.API.SITE}: Online endpoints'
       type: DEPENDENT
@@ -1374,6 +1435,16 @@ zabbix_export:
       - tag: site
         value: '{$EMS.API.SITE}'
       units: '%'
+      triggers:
+      - uuid: 48328e40a61e4e52b98ec7804fc64cb7
+        expression: last(/FortiClient EMS by HTTP/ems.api.endpoints.total)>0 and last(/FortiClient EMS by HTTP/ems.api.endpoints.online_pct)<{$EMS.API.ENDPOINTS.ONLINE_WARN}
+        name: 'Site {$EMS.API.SITE}: online endpoint percentage is low'
+        priority: WARNING
+        description: Disabled by default because endpoint availability depends on deployment policy.
+        tags:
+        - tag: component
+          value: endpoints-api
+        status: DISABLED
     - uuid: ec6ee9375fc042dfb8093e0b840abdda
       name: 'Site {$EMS.API.SITE}: Offline endpoints'
       type: DEPENDENT
@@ -1756,6 +1827,16 @@ zabbix_export:
         value: site
       - tag: site
         value: '{$EMS.API.SITE}'
+      triggers:
+      - uuid: 0c0dff83ffeb49729d038d0f38121d47
+        expression: last(/FortiClient EMS by HTTP/ems.api.security.critical_vulnerabilities)>0
+        name: 'Site {$EMS.API.SITE}: critical vulnerabilities detected'
+        priority: HIGH
+        description: Disabled by default to avoid alert floods in environments with existing findings.
+        tags:
+        - tag: component
+          value: security-api
+        status: DISABLED
     - uuid: 6ef1d0645f8d4ab693e08b87d7e9631d
       name: 'Site {$EMS.API.SITE}: Endpoints with vulnerabilities'
       type: DEPENDENT
@@ -2075,6 +2156,15 @@ zabbix_export:
         value: global
       - tag: site
         value: '{$EMS.API.SITE}'
+      triggers:
+      - uuid: d064c3f54bb54546964223085670ee5a
+        expression: last(/FortiClient EMS by HTTP/ems.api.system.ha_members)>0 and last(/FortiClient EMS by HTTP/ems.api.system.ha_alive)<last(/FortiClient EMS by HTTP/ems.api.system.ha_members)
+        name: 'EMS: HA member unavailable'
+        priority: HIGH
+        description: EMS reports fewer live HA members than configured members.
+        tags:
+        - tag: component
+          value: system-api
     - uuid: be362a35d4544e0e9c04370574c51ca2
       name: 'Site {$EMS.API.SITE}: Alive primary HA members'
       type: DEPENDENT
@@ -2671,6 +2761,15 @@ zabbix_export:
         value: global
       - tag: site
         value: '{$EMS.API.SITE}'
+      triggers:
+      - uuid: deef1ba7e73d4ec2971449c610ff04ed
+        expression: last(/FortiClient EMS by HTTP/ems.api.certificates.server_expired)>0
+        name: 'EMS: server certificate expired'
+        priority: HIGH
+        description: At least one server certificate expiry date has passed.
+        tags:
+        - tag: component
+          value: certificates-api
     - uuid: fe0076620ade49189e1664265de0f4e5
       name: 'Site {$EMS.API.SITE}: Server certificates expiring within 30 days'
       type: DEPENDENT
@@ -2692,6 +2791,15 @@ zabbix_export:
         value: global
       - tag: site
         value: '{$EMS.API.SITE}'
+      triggers:
+      - uuid: 9bac7da350ea466689f21b8229940f88
+        expression: last(/FortiClient EMS by HTTP/ems.api.certificates.server_expiring_30d)>0
+        name: 'EMS: server certificate expires within 30 days'
+        priority: WARNING
+        description: At least one server certificate expires in the next 30 calendar days.
+        tags:
+        - tag: component
+          value: certificates-api
     - uuid: 57cb830c5bec4863baa0a55e8023801a
       name: 'Site {$EMS.API.SITE}: Earliest server certificate expiry'
       type: DEPENDENT
@@ -2948,6 +3056,84 @@ zabbix_export:
         value: global
       - tag: site
         value: '{$EMS.API.SITE}'
+    - uuid: a706982275f842a9a4185ba228aadb42
+      name: 'Site {$EMS.API.SITE}: EPP expiry timestamp'
+      type: DEPENDENT
+      key: ems.api.license.epp.expiry_epoch
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - 'var n = JSON.parse(value).epp.expiry_epoch; return n === null || n === undefined ? null : n;'
+      tags:
+      - tag: component
+        value: license-api
+      - tag: scope
+        value: site
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      units: unixtime
+      triggers:
+      - uuid: 3ae250343baf44148564913cf9c7ef83
+        expression: last(/FortiClient EMS by HTTP/ems.api.license.epp.allocated)>0 and last(/FortiClient EMS by HTTP/ems.api.license.epp.expiry_epoch)>now() and last(/FortiClient EMS by HTTP/ems.api.license.epp.expiry_epoch)<=now()+{$EMS.API.LICENSE.EXPIRY_WARN_DAYS}*86400
+        name: 'Site {$EMS.API.SITE}: EPP license expires soon'
+        priority: WARNING
+        description: The earliest active license expiry is within the configured warning horizon.
+        tags:
+        - tag: component
+          value: license-api
+      - uuid: c3824630ed364837890829557cdc01ac
+        expression: last(/FortiClient EMS by HTTP/ems.api.license.epp.allocated)>0 and last(/FortiClient EMS by HTTP/ems.api.license.epp.expiry_epoch)>0 and last(/FortiClient EMS by HTTP/ems.api.license.epp.expiry_epoch)<=now()
+        name: 'Site {$EMS.API.SITE}: EPP license has expired'
+        priority: HIGH
+        description: The earliest active license expiry is in the past.
+        tags:
+        - tag: component
+          value: license-api
+    - uuid: 254d8682c6cf411781aa2c47c09b8b4d
+      name: 'Site {$EMS.API.SITE}: ZTNA expiry timestamp'
+      type: DEPENDENT
+      key: ems.api.license.ztna.expiry_epoch
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.license.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - 'var n = JSON.parse(value).ztna.expiry_epoch; return n === null || n === undefined ? null : n;'
+      tags:
+      - tag: component
+        value: license-api
+      - tag: scope
+        value: site
+      - tag: site
+        value: '{$EMS.API.SITE}'
+      units: unixtime
+      triggers:
+      - uuid: fb49688d31574109911037d9fb5c19c7
+        expression: last(/FortiClient EMS by HTTP/ems.api.license.ztna.allocated)>0 and last(/FortiClient EMS by HTTP/ems.api.license.ztna.expiry_epoch)>now() and last(/FortiClient EMS by HTTP/ems.api.license.ztna.expiry_epoch)<=now()+{$EMS.API.LICENSE.EXPIRY_WARN_DAYS}*86400
+        name: 'Site {$EMS.API.SITE}: ZTNA license expires soon'
+        priority: WARNING
+        description: The earliest active license expiry is within the configured warning horizon.
+        tags:
+        - tag: component
+          value: license-api
+      - uuid: b885edd2ee9e400595b520c2535ee9ab
+        expression: last(/FortiClient EMS by HTTP/ems.api.license.ztna.allocated)>0 and last(/FortiClient EMS by HTTP/ems.api.license.ztna.expiry_epoch)>0 and last(/FortiClient EMS by HTTP/ems.api.license.ztna.expiry_epoch)<=now()
+        name: 'Site {$EMS.API.SITE}: ZTNA license has expired'
+        priority: HIGH
+        description: The earliest active license expiry is in the past.
+        tags:
+        - tag: component
+          value: license-api
     discovery_rules:
     - uuid: 91ce9af7d18144e88b571a8edbbef288
       name: 'Site {$EMS.API.SITE}: Other license type discovery'
@@ -3130,7 +3316,54 @@ zabbix_export:
           value: '{$EMS.API.SITE}'
         - tag: license_type
           value: '{#LICENSE_TYPE}'
+      - uuid: 323840cbfbed412484bf6197c5455a15
+        name: 'Site {$EMS.API.SITE}: {#LICENSE_TYPE} earliest expiry timestamp'
+        type: DEPENDENT
+        key: ems.api.license.type[{#LICENSE_TYPE},expiry_epoch]
+        delay: '0'
+        history: 30d
+        trends: 365d
+        value_type: UNSIGNED
+        master_item:
+          key: ems.api.license.raw
+        preprocessing:
+        - type: JAVASCRIPT
+          parameters:
+          - 'var n = JSON.parse(value).types["{#LICENSE_TYPE}"].expiry_epoch; return n === null || n === undefined ? 0 : n;'
+        tags:
+        - tag: component
+          value: license-api
+        - tag: site
+          value: '{$EMS.API.SITE}'
+        - tag: license_type
+          value: '{#LICENSE_TYPE}'
+        units: unixtime
       description: Discovers active license types other than EPP and ZTNA; zero-only types are omitted.
+      trigger_prototypes:
+      - uuid: 0ff9313b66b344daaf1b78496bbea3a6
+        expression: last(/FortiClient EMS by HTTP/ems.api.license.type[{#LICENSE_TYPE},allocated])>0 and last(/FortiClient EMS by HTTP/ems.api.license.type[{#LICENSE_TYPE},utilization])>={$EMS.API.LICENSE.WARN}
+        name: 'Site {$EMS.API.SITE}: {#LICENSE_TYPE} license utilization is high'
+        priority: WARNING
+        description: Discovered active license type has reached the configured utilization threshold.
+        tags:
+        - tag: component
+          value: license-api
+      - uuid: df847cdbea0d40d99a5a7bce02c5353f
+        expression: last(/FortiClient EMS by HTTP/ems.api.license.type[{#LICENSE_TYPE},allocated])>0 and last(/FortiClient EMS by HTTP/ems.api.license.type[{#LICENSE_TYPE},expiry_epoch])>now() and last(/FortiClient EMS by HTTP/ems.api.license.type[{#LICENSE_TYPE},expiry_epoch])<=now()+{$EMS.API.LICENSE.EXPIRY_WARN_DAYS}*86400
+        name: 'Site {$EMS.API.SITE}: {#LICENSE_TYPE} license expires soon'
+        priority: WARNING
+        description: Discovered active license type expires within the warning horizon.
+        tags:
+        - tag: component
+          value: license-api
+      - uuid: efe223efc52d49daa943df1fada2b9a5
+        expression: last(/FortiClient EMS by HTTP/ems.api.license.type[{#LICENSE_TYPE},allocated])>0 and last(/FortiClient EMS by HTTP/ems.api.license.type[{#LICENSE_TYPE},expiry_epoch])>0 and last(/FortiClient EMS by HTTP/ems.api.license.type[{#LICENSE_TYPE},expiry_epoch])<=now()
+        name: 'Site {$EMS.API.SITE}: {#LICENSE_TYPE} license has expired'
+        priority: HIGH
+        description: Discovered active license type has passed its expiry date.
+        tags:
+        - tag: component
+          value: license-api
     macros:
     - macro: '{$EMS.API.URL}'
       value: ''
@@ -3168,3 +3401,21 @@ zabbix_export:
     - macro: '{$EMS.API.INVENTORY.INTERVAL}'
       value: 1h
       description: Polling interval for inventory API master item.
+    - macro: '{$EMS.API.LICENSE.WARN}'
+      value: '90'
+      description: License utilization warning threshold in percent.
+    - macro: '{$EMS.API.LICENSE.EXPIRY_WARN_DAYS}'
+      value: '30'
+      description: License expiry warning horizon in days.
+    - macro: '{$EMS.API.ENDPOINTS.ONLINE_WARN}'
+      value: '90'
+      description: Optional online endpoint percentage warning threshold.
+    - macro: '{$EMS.API.PERFMON.CPU_WARN}'
+      value: '85'
+      description: Optional overall CPU warning threshold in percent.
+    - macro: '{$EMS.API.PERFMON.RAM_WARN}'
+      value: '90'
+      description: Optional RAM warning threshold in percent.
+    - macro: '{$EMS.API.PERFMON.DISK_WARN}'
+      value: '90'
+      description: Optional maximum disk usage warning threshold in percent.
