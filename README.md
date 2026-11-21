@@ -63,7 +63,7 @@ Endpoint online percentage and critical vulnerability triggers are included but 
 
 ## Host dashboard
 
-The template includes **EMS: Overview**, a host dashboard with EPP and ZTNA license summaries, online endpoint count, server certificates expiring within 30 days, 24-hour CPU/RAM/disk graphs, an EPP used-versus-allocated seats graph, and current problems. It uses enabled items only. Open it from the monitored host's Dashboards tab after linking the template.
+The template includes **EMS: Overview**, a host dashboard with EPP and ZTNA license summaries, online and offline endpoint counts, 24-hour CPU/RAM/disk graphs, an EPP used-versus-allocated seats graph, and current problems. It uses enabled items only. Open it from the monitored host's Dashboards tab after linking the template.
 
 ## Data handling and compatibility
 
