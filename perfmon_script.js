@@ -1,6 +1,6 @@
 var p = JSON.parse(value);
 var base = p.base_url.replace(/\/$/, '');
-if (!/^https:\/\/[^/]+$/.test(base) || !p.site || !p.username || !p.password)
+if (!/^https:\/\/[^/]+$/.test(base) || !p.username || !p.password)
     throw 'Invalid EMS perfmon parameters';
 
 var req = new HttpRequest();
@@ -48,7 +48,7 @@ function parsed(body, operation) {
 var org = '1';
 headers(false, true);
 req.post(base + '/api/v1/auth/signin', JSON.stringify({
-    name: p.username, password: p.password, site: p.site
+    name: p.username, password: p.password
 }));
 checked(200, 'signin');
 captureCookies();
