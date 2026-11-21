@@ -3393,8 +3393,11 @@ zabbix_export:
           - type: INTEGER
             name: value_size
             value: '34'
+          - type: INTEGER
+            name: decimal_places
+            value: '0'
         - type: item
-          name: Server certificates expiring within 30 days
+          name: Offline endpoints
           x: '54'
           width: '18'
           height: '3'
@@ -3403,13 +3406,16 @@ zabbix_export:
             name: itemid.0
             value:
               host: FortiClient EMS by HTTP
-              key: ems.api.certificates.server_expiring_30d
+              key: ems.api.endpoints.offline
           - type: INTEGER
             name: show.0
             value: '2'
           - type: INTEGER
             name: value_size
             value: '34'
+          - type: INTEGER
+            name: decimal_places
+            value: '0'
         - type: svggraph
           name: CPU utilization
           x: '0'
@@ -3432,6 +3438,9 @@ zabbix_export:
           - type: INTEGER
             name: legend_statistic
             value: '1'
+          - type: STRING
+            name: time_period.to
+            value: now
         - type: svggraph
           name: RAM utilization
           x: '24'
@@ -3454,6 +3463,9 @@ zabbix_export:
           - type: INTEGER
             name: legend_statistic
             value: '1'
+          - type: STRING
+            name: time_period.to
+            value: now
         - type: svggraph
           name: Highest disk utilization
           x: '48'
@@ -3476,6 +3488,9 @@ zabbix_export:
           - type: INTEGER
             name: legend_statistic
             value: '1'
+          - type: STRING
+            name: time_period.to
+            value: now
         - type: svggraph
           name: EPP license seats
           x: '0'
@@ -3504,6 +3519,9 @@ zabbix_export:
           - type: INTEGER
             name: legend_statistic
             value: '1'
+          - type: STRING
+            name: time_period.to
+            value: now
         - type: problems
           name: Problems
           x: '36'
