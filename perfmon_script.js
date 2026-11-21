@@ -121,9 +121,7 @@ if (!dto.spec || !Array.isArray(dto.spec.panels)) throw 'EMS perfmon dashboard d
 var wanted = {
     'System Overall CPU Usage (%)': 'cpu_pct',
     'RAM System Usage (%)': 'ram_pct',
-    'Swap Usage (%)': 'swap_pct',
     'Disk Space Usage (%)': 'disk_max_pct',
-    'Online Endpoints': 'online_endpoints',
     'DB Connections (totals)': 'db_connections',
     'EMS nodes online': 'ems_nodes_online',
     'DB nodes latency (ms)': 'db_latency_max_ms',
@@ -170,8 +168,8 @@ function latest(frame) {
     return null;
 }
 var output = {
-    cpu_pct: null, ram_pct: null, swap_pct: null, disk_max_pct: null,
-    online_endpoints: null, db_connections: null, ems_nodes_online: null,
+    cpu_pct: null, ram_pct: null, disk_max_pct: null,
+    db_connections: null, ems_nodes_online: null,
     db_latency_max_ms: null, net_recv_bps: null, net_sent_bps: null,
     network_connections: null, keep_alive_ms: null, keep_alive_records: null,
     ems_process_cpu_max: null, ems_process_ram_max_pct: null,
@@ -199,7 +197,7 @@ Object.keys(byRef).forEach(function (ref) {
     if (metric === 'disk_max_pct' || metric === 'db_latency_max_ms' ||
         metric === 'ems_process_cpu_max' || metric === 'ems_process_ram_max_pct')
         output[metric] = Math.max.apply(null, numbers);
-    else if (metric === 'db_connections' || metric === 'ems_nodes_online' || metric === 'online_endpoints')
+    else if (metric === 'db_connections' || metric === 'ems_nodes_online')
         output[metric] = numbers.reduce(function (a, b) { return a + b; }, 0);
     else output[metric] = numbers[0];
 });
