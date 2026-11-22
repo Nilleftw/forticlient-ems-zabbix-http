@@ -78,3 +78,7 @@ The license, dashboard, and several other routes were observed in the EMS web in
 Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Six collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. The host dashboard imported with all nine widgets; all four graphs returned SVG data through the Zabbix widget endpoint.
 
 References: [Zabbix Script items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/script), [dependent items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/dependent_items), and [template import](https://www.zabbix.com/documentation/7.0/en/manual/api/reference/configuration/import).
+
+## License
+
+MIT. See [LICENSE](LICENSE). Maintained by Nilleftw; not an official Fortinet template.
