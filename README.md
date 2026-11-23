@@ -106,9 +106,15 @@ The template stores normalized monitoring values instead of raw EMS responses. T
 
 The license, dashboard, and several other routes were observed in the EMS web interface; they are not all present in the supplied Fortinet OpenAPI files. See [API_COVERAGE.md](API_COVERAGE.md) for the routes used by each group. Performance collection uses EMS's internal Grafana endpoints and may need adjustments on other EMS versions. Certificate expiry comparisons use the date portion of the EMS response.
 
+### EMS 7.2.14 compatibility note
+
+A limited test against EMS 7.2.14 returned license and endpoint values, the installed EMS version, and endpoint fabric activity. Two collection groups failed with HTTP 404: `ems.api.perfmon.raw` at `GET /api/v1/session/check`, and `ems.api.security.raw` at `GET /api/v1/tags/zero_trust/error_count`. Each group is collected by one Script item, so the missing Zero Trust tag route prevents the entire Security group from updating. [Fortinet lists the Performance dashboard as a new EMS 7.4.5 feature](https://docs.fortinet.com/document/forticlient/7.4.0/new-features/862171/7-4-5); its Grafana-based collection should not be expected to work on EMS 7.2.14.
+
+For EMS 7.2.14, disable the Performance and Security master items and their related triggers to avoid unsupported-item and false no-data alerts. The CPU, RAM, disk, and Security metrics from those groups will be unavailable. Other routes have not been fully validated on 7.2.14, so this remains a template tested primarily with EMS 7.4.8. No separate 7.2 template is provided.
+
 ## Validation
 
-Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Eight collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The client-version discovery created Windows and macOS items in the lab; the new dashboard widgets displayed live values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. The host dashboard has one page with twelve widgets, including three performance graphs. EMS 7.2.x compatibility has not been tested for the newly added dashboard routes.
+Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Eight collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The client-version discovery created Windows and macOS items in the lab; the new dashboard widgets displayed live values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. The host dashboard has one page with twelve widgets, including three performance graphs. EMS 7.2.14 was tested only as described in the compatibility note above.
 
 References: [Zabbix Script items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/script), [dependent items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/dependent_items), and [template import](https://www.zabbix.com/documentation/7.0/en/manual/api/reference/configuration/import).
 
