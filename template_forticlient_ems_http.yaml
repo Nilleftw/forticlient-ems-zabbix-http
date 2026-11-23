@@ -1167,6 +1167,291 @@ zabbix_export:
         value: license-api
       - tag: scope
         value: site
+    - uuid: 983f2da5cec94d00a08d14755952382f
+      name: 'EMS identity API data'
+      type: SCRIPT
+      key: ems.api.identity.raw
+      delay: '{$EMS.API.IDENTITY.INTERVAL}'
+      history: 1d
+      trends: '0'
+      value_type: TEXT
+      params: |
+        var p = JSON.parse(value);
+        var base = p.base_url.replace(/\/$/, '').replace(/:443$/, '');
+        if (!/^https:\/\/[^/]+$/.test(base) || !p.site || !p.username || !p.password)
+            throw 'Invalid EMS identity API parameters';
+        var req = new HttpRequest();
+        req.addHeader('Accept: application/json');
+        req.addHeader('Content-Type: application/json');
+        req.addHeader('EMS-Call-Type: 2');
+        var body = req.post(base + '/api/v1/auth/signin', JSON.stringify({
+            name: p.username, password: p.password, site: p.site
+        }));
+        if (req.getStatus() !== 200) throw 'EMS identity signin HTTP ' + req.getStatus();
+        var signin = JSON.parse(body);
+        if (!signin.result || Number(signin.result.retval) !== 1)
+            throw 'EMS identity signin rejected';
+        var cookies = [], csrf = '';
+        var headers = req.getHeaders(true);
+        Object.keys(headers).forEach(function (name) {
+            if (name.toLowerCase() !== 'set-cookie') return;
+            var values = Array.isArray(headers[name]) ? headers[name] : [headers[name]];
+            values.forEach(function (header) {
+                var pair = String(header).split(';', 1)[0];
+                var pos = pair.indexOf('=');
+                if (pos < 1) return;
+                cookies.push(pair);
+                if (pair.slice(0, pos).toLowerCase() === 'csrftoken') csrf = pair.slice(pos + 1);
+            });
+        });
+        if (!cookies.length) throw 'EMS identity signin returned no session cookie';
+        req.clearHeader();
+        req.addHeader('Accept: application/json');
+        req.addHeader('EMS-Call-Type: 2');
+        req.addHeader('Cookie: ' + cookies.join('; '));
+        req.addHeader('Origin: ' + base);
+        req.addHeader('Referer: ' + base + '/');
+        if (csrf) req.addHeader('X-CSRFToken: ' + csrf);
+        body = req.get(base + '/api/v1/init_consts');
+        if (req.getStatus() !== 200) throw 'EMS init_consts HTTP ' + req.getStatus();
+        var response = JSON.parse(body);
+        if (!response.result || Number(response.result.retval) !== 1 ||
+            !response.data || !response.data.consts || !response.data.consts.System)
+            throw 'EMS init_consts schema changed';
+        var system = response.data.consts.System;
+        var version = String(system.VERSION_FULL || system.VERSION || '');
+        var started = Date.parse(system.START_TIME || '');
+        if (!/^\d+\.\d+\.\d+(?:\.\d+)?$/.test(version) || !isFinite(started))
+            throw 'EMS identity version or start time missing';
+        return JSON.stringify({version: version,
+            mode: system.HA_ENABLED ? 'HA' : 'Standalone',
+            start_epoch: Math.floor(started / 1000)});
+      timeout: 30s
+      parameters:
+      - name: base_url
+        value: '{$EMS.API.URL}'
+      - name: site
+        value: '{$EMS.API.SITE}'
+      - name: username
+        value: '{$EMS.API.USERNAME}'
+      - name: password
+        value: '{$EMS.API.PASSWORD}'
+      description: Extracts installed EMS version, HA mode, and start time from init_consts. The large API response is never stored.
+      tags:
+      - tag: component
+        value: raw-identity-api
+      - tag: scope
+        value: global
+    - uuid: 4f2df8fb4d79488b98a20bfbb7c2c50d
+      name: 'EMS installed version and build'
+      type: DEPENDENT
+      key: ems.api.identity.version
+      delay: '0'
+      history: 30d
+      trends: '0'
+      value_type: CHAR
+      master_item:
+        key: ems.api.identity.raw
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.version
+      tags:
+      - tag: component
+        value: identity-api
+    - uuid: 014215881e82447f83ab662fc9356c04
+      name: 'EMS mode'
+      type: DEPENDENT
+      key: ems.api.identity.mode
+      delay: '0'
+      history: 30d
+      trends: '0'
+      value_type: CHAR
+      master_item:
+        key: ems.api.identity.raw
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.mode
+      tags:
+      - tag: component
+        value: identity-api
+    - uuid: 772262f0faf14034baf6784a570611d4
+      name: 'EMS start time'
+      type: DEPENDENT
+      key: ems.api.identity.start_epoch
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.identity.raw
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.start_epoch
+      units: unixtime
+      tags:
+      - tag: component
+        value: identity-api
+    - uuid: b827fe2079c7468183b4feb5e838d0bf
+      name: 'EMS uptime'
+      type: CALCULATED
+      key: ems.api.identity.uptime
+      delay: 5m
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      params: now()-last(//ems.api.identity.start_epoch)
+      units: uptime
+      tags:
+      - tag: component
+        value: identity-api
+    - uuid: ce3bc066993c4dfb8da93fcaf966db5c
+      name: 'Site {$EMS.API.SITE}: Client dashboard API data'
+      type: SCRIPT
+      key: ems.api.client_dashboard.raw
+      delay: '{$EMS.API.CLIENT_DASHBOARD.INTERVAL}'
+      history: 1d
+      trends: '0'
+      value_type: TEXT
+      params: |
+        var p = JSON.parse(value);
+        var base = p.base_url.replace(/\/$/, '').replace(/:443$/, '');
+        if (!/^https:\/\/[^/]+$/.test(base) || !p.site || !p.username || !p.password)
+            throw 'Invalid EMS client dashboard API parameters';
+        var req = new HttpRequest();
+        req.addHeader('Accept: application/json');
+        req.addHeader('Content-Type: application/json');
+        req.addHeader('EMS-Call-Type: 2');
+        var body = req.post(base + '/api/v1/auth/signin', JSON.stringify({
+            name: p.username, password: p.password, site: p.site
+        }));
+        if (req.getStatus() !== 200) throw 'EMS client dashboard signin HTTP ' + req.getStatus();
+        var signin = JSON.parse(body);
+        if (!signin.result || Number(signin.result.retval) !== 1)
+            throw 'EMS client dashboard signin rejected';
+        var cookies = [], csrf = '';
+        var headers = req.getHeaders(true);
+        Object.keys(headers).forEach(function (name) {
+            if (name.toLowerCase() !== 'set-cookie') return;
+            var values = Array.isArray(headers[name]) ? headers[name] : [headers[name]];
+            values.forEach(function (header) {
+                var pair = String(header).split(';', 1)[0];
+                var pos = pair.indexOf('=');
+                if (pos < 1) return;
+                cookies.push(pair);
+                if (pair.slice(0, pos).toLowerCase() === 'csrftoken') csrf = pair.slice(pos + 1);
+            });
+        });
+        if (!cookies.length) throw 'EMS client dashboard signin returned no session cookie';
+        req.clearHeader();
+        req.addHeader('Accept: application/json');
+        req.addHeader('EMS-Call-Type: 2');
+        req.addHeader('Cookie: ' + cookies.join('; '));
+        req.addHeader('Origin: ' + base);
+        req.addHeader('Referer: ' + base + '/');
+        if (csrf) req.addHeader('X-CSRFToken: ' + csrf);
+        function get(path) {
+            var body = req.get(base + '/api/v1/' + path);
+            if (req.getStatus() !== 200)
+                throw 'EMS client dashboard ' + path + ' HTTP ' + req.getStatus();
+            var response = JSON.parse(body);
+            if (!response.result || Number(response.result.retval) !== 1 || !Array.isArray(response.data))
+                throw 'EMS client dashboard ' + path + ' schema changed';
+            return response.data;
+        }
+        var versions = {windows: {}, macos: {}, linux: {}}, discovery = [];
+        [['windows', 'fctversionwindows'], ['macos', 'fctversionmac'],
+            ['linux', 'fctversionlinux']].forEach(function (pair) {
+            get('endpoints/' + pair[1] + '/donut').forEach(function (entry) {
+                var version = String(entry.name || '');
+                var count = Number(entry.value);
+                if (!/^\d+\.\d+\.\d+(?:\.\d+)?$/.test(version) ||
+                    !isFinite(count) || count < 0 || Math.floor(count) !== count)
+                    throw 'Invalid EMS FortiClient version data';
+                if (count === 0) return;
+                versions[pair[0]][version] = count;
+                discovery.push({'{#FCT_OS}': pair[0], '{#FCT_VERSION}': version});
+            });
+        });
+        var activity = {on_fabric: 0, off_fabric: 0, not_applicable: 0};
+        get('endpoints/activity/donut').forEach(function (entry) {
+            var count = Number(entry.value);
+            if (!isFinite(count) || count < 0 || Math.floor(count) !== count)
+                throw 'Invalid EMS endpoint activity count';
+            if (entry.token === 'emsOnnet') activity.on_fabric += count;
+            else if (entry.token === 'emsOffnet') activity.off_fabric += count;
+            else if (entry.token === 'emsNotApplicable') activity.not_applicable += count;
+        });
+        return JSON.stringify({versions: versions, discovery: discovery, activity: activity});
+      timeout: 30s
+      parameters:
+      - name: base_url
+        value: '{$EMS.API.URL}'
+      - name: site
+        value: '{$EMS.API.SITE}'
+      - name: username
+        value: '{$EMS.API.USERNAME}'
+      - name: password
+        value: '{$EMS.API.PASSWORD}'
+      description: Site-scoped FortiClient version distribution and endpoint fabric activity. Stores aggregate counts only.
+      tags:
+      - tag: component
+        value: raw-client-dashboard-api
+      - tag: scope
+        value: site
+    - uuid: 9de0e00668c24a0f8bec810e70b122a5
+      name: 'Endpoints on-fabric'
+      type: DEPENDENT
+      key: ems.api.activity.on_fabric
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.client_dashboard.raw
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.activity.on_fabric
+      tags:
+      - tag: component
+        value: client-dashboard-api
+    - uuid: 91d223ec471f4f3e8772ed846cade78a
+      name: 'Endpoints off-fabric'
+      type: DEPENDENT
+      key: ems.api.activity.off_fabric
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.client_dashboard.raw
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.activity.off_fabric
+      tags:
+      - tag: component
+        value: client-dashboard-api
+    - uuid: 86aaffaebe4846409da0d7a93da020d7
+      name: 'Endpoints fabric status unknown'
+      type: DEPENDENT
+      key: ems.api.activity.not_applicable
+      delay: '0'
+      history: 30d
+      trends: 365d
+      value_type: UNSIGNED
+      master_item:
+        key: ems.api.client_dashboard.raw
+      preprocessing:
+      - type: JSONPATH
+        parameters:
+        - $.activity.not_applicable
+      tags:
+      - tag: component
+        value: client-dashboard-api
     - uuid: 4f50fd3361aa4e2d847e8f86c381b643
       name: 'Site {$EMS.API.SITE}: Endpoints API data'
       type: SCRIPT
@@ -3108,6 +3393,40 @@ zabbix_export:
         - tag: component
           value: license-api
     discovery_rules:
+    - uuid: f4a667238aa1457281f717b44977508a
+      name: 'Site {$EMS.API.SITE}: FortiClient version discovery'
+      type: DEPENDENT
+      key: ems.api.client_versions.discovery
+      delay: '0'
+      master_item:
+        key: ems.api.client_dashboard.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - return JSON.stringify(JSON.parse(value).discovery);
+      item_prototypes:
+      - uuid: b56ac7aee52a406c837ccb49952bd365
+        name: 'FortiClient version {#FCT_OS} {#FCT_VERSION}'
+        type: DEPENDENT
+        key: ems.api.client_versions.count[{#FCT_OS},{#FCT_VERSION}]
+        delay: '0'
+        history: 30d
+        trends: 365d
+        value_type: UNSIGNED
+        master_item:
+          key: ems.api.client_dashboard.raw
+        preprocessing:
+        - type: JAVASCRIPT
+          parameters:
+          - 'return JSON.parse(value).versions["{#FCT_OS}"]["{#FCT_VERSION}"];'
+        tags:
+        - tag: component
+          value: client-versions-api
+        - tag: os
+          value: '{#FCT_OS}'
+        - tag: version
+          value: '{#FCT_VERSION}'
+      description: Discovers nonzero Windows, macOS, and Linux FortiClient version counts for the site.
     - uuid: 91ce9af7d18144e88b571a8edbbef288
       name: 'Site {$EMS.API.SITE}: Other license type discovery'
       type: DEPENDENT
@@ -3344,6 +3663,12 @@ zabbix_export:
     - macro: '{$EMS.API.ENDPOINTS.INTERVAL}'
       value: 10m
       description: Polling interval for endpoints API master item.
+    - macro: '{$EMS.API.IDENTITY.INTERVAL}'
+      value: 1h
+      description: Polling interval for the global EMS identity API master item.
+    - macro: '{$EMS.API.CLIENT_DASHBOARD.INTERVAL}'
+      value: 1h
+      description: Polling interval for site-scoped FortiClient version and fabric-activity data.
     - macro: '{$EMS.API.SECURITY.INTERVAL}'
       value: 30m
       description: Polling interval for security API master item.
@@ -3596,3 +3921,145 @@ zabbix_export:
           - type: INTEGER
             name: show_tags
             value: '1'
+      - name: System and clients
+        widgets:
+        - type: item
+          name: EMS version
+          x: '0'
+          y: '0'
+          width: '24'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.identity.version
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: value_size
+            value: '20'
+        - type: item
+          name: EMS uptime
+          x: '24'
+          y: '0'
+          width: '24'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.identity.uptime
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: value_size
+            value: '20'
+        - type: item
+          name: EMS mode
+          x: '48'
+          y: '0'
+          width: '24'
+          height: '3'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.identity.mode
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: value_size
+            value: '20'
+        - type: piechart
+          name: FortiClient versions by OS
+          x: '0'
+          y: '3'
+          width: '36'
+          height: '9'
+          fields:
+          - type: INTEGER
+            name: ds.0.dataset_type
+            value: '1'
+          - type: STRING
+            name: ds.0.items.0
+            value: 'FortiClient version *'
+          - type: STRING
+            name: ds.0.color
+            value: 66BB6A
+          - type: INTEGER
+            name: draw_type
+            value: '1'
+          - type: INTEGER
+            name: total_show
+            value: '1'
+          - type: INTEGER
+            name: decimal_places
+            value: '0'
+          - type: INTEGER
+            name: legend_value
+            value: '1'
+          - type: INTEGER
+            name: legend_lines_mode
+            value: '1'
+          - type: INTEGER
+            name: legend_lines
+            value: '8'
+        - type: piechart
+          name: Endpoint fabric activity
+          x: '36'
+          y: '3'
+          width: '36'
+          height: '9'
+          fields:
+          - type: INTEGER
+            name: ds.0.dataset_type
+            value: '0'
+          - type: ITEM
+            name: ds.0.itemids.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.activity.on_fabric
+          - type: STRING
+            name: ds.0.color.0
+            value: 76D3A1
+          - type: ITEM
+            name: ds.0.itemids.1
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.activity.off_fabric
+          - type: STRING
+            name: ds.0.color.1
+            value: BFF4D6
+          - type: ITEM
+            name: ds.0.itemids.2
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.activity.not_applicable
+          - type: STRING
+            name: ds.0.color.2
+            value: B2B8BD
+          - type: INTEGER
+            name: draw_type
+            value: '1'
+          - type: INTEGER
+            name: total_show
+            value: '1'
+          - type: INTEGER
+            name: decimal_places
+            value: '0'
+          - type: INTEGER
+            name: legend_value
+            value: '1'
+          - type: INTEGER
+            name: legend_lines_mode
+            value: '1'
+          - type: INTEGER
+            name: legend_lines
+            value: '3'
