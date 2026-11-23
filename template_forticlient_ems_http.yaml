@@ -211,7 +211,7 @@ zabbix_export:
       - tag: license_type
         value: EPP
     - uuid: effe729977f9483fae27c1918955e1fc
-      name: 'EPP warning at {$EMS.API.LICENSE.WARN}%'
+      name: 'EPP trigger threshold ({$EMS.API.LICENSE.WARN}%)'
       type: CALCULATED
       key: ems.api.license.epp.warning_seats
       delay: 5m
@@ -219,7 +219,7 @@ zabbix_export:
       trends: 365d
       value_type: FLOAT
       params: 'last(//ems.api.license.epp.allocated)*{$EMS.API.LICENSE.WARN}/100'
-      description: Seat threshold derived from current allocation and the license warning macro. For 1000 allocated seats and a 90% threshold, the result is 900.
+      description: Visual seat threshold for the EPP utilization trigger, derived from current allocation and the license warning macro. For 1000 allocated seats and a 90% threshold, the result is 900. This item is a graph line; the utilization trigger generates alerts.
       tags:
       - tag: component
         value: license-api
@@ -3596,7 +3596,7 @@ zabbix_export:
             value: '0'
           - type: STRING
             name: ds.2.color.0
-            value: E53935
+            value: FFC859
           - type: ITEM
             name: ds.2.itemids.0
             value:
