@@ -1461,7 +1461,7 @@ zabbix_export:
       - tag: scope
         value: site
     - uuid: 8a5fd3bc1f874058ab0021586355e414
-      name: 'Endpoints online / offline'
+      name: 'Endpoints online / total'
       type: DEPENDENT
       key: ems.api.endpoints.summary
       delay: '0'
@@ -1473,8 +1473,8 @@ zabbix_export:
       preprocessing:
       - type: JAVASCRIPT
         parameters:
-        - 'var d = JSON.parse(value); return String(d.online) + " / " + String(d.offline);'
-      description: Compact online and offline endpoint counts for the host dashboard.
+        - 'var d = JSON.parse(value); return String(d.online) + " / " + String(d.total);'
+      description: Compact online and total endpoint counts for the host dashboard.
       tags:
       - tag: component
         value: endpoints-api
@@ -3422,7 +3422,7 @@ zabbix_export:
             name: value_size
             value: '28'
         - type: item
-          name: Endpoints online / offline
+          name: Endpoints online / total
           x: '48'
           y: '2'
           width: '24'
@@ -3481,6 +3481,9 @@ zabbix_export:
             name: ds.1.data_set_label
             value: 15m average
           - type: INTEGER
+            name: ds.1.axisy
+            value: '1'
+          - type: INTEGER
             name: ds.1.fill
             value: '1'
           - type: STRING
@@ -3498,6 +3501,15 @@ zabbix_export:
           - type: STRING
             name: lefty_max
             value: '100'
+          - type: STRING
+            name: righty_min
+            value: '0'
+          - type: STRING
+            name: righty_max
+            value: '100'
+          - type: INTEGER
+            name: righty
+            value: '0'
           - type: INTEGER
             name: legend_lines
             value: '3'
@@ -3546,6 +3558,9 @@ zabbix_export:
             name: ds.1.data_set_label
             value: 15m average
           - type: INTEGER
+            name: ds.1.axisy
+            value: '1'
+          - type: INTEGER
             name: ds.1.fill
             value: '1'
           - type: STRING
@@ -3563,6 +3578,15 @@ zabbix_export:
           - type: STRING
             name: lefty_max
             value: '100'
+          - type: STRING
+            name: righty_min
+            value: '0'
+          - type: STRING
+            name: righty_max
+            value: '100'
+          - type: INTEGER
+            name: righty
+            value: '0'
           - type: INTEGER
             name: legend_lines
             value: '3'
@@ -3611,6 +3635,9 @@ zabbix_export:
             name: ds.1.data_set_label
             value: 15m average
           - type: INTEGER
+            name: ds.1.axisy
+            value: '1'
+          - type: INTEGER
             name: ds.1.fill
             value: '1'
           - type: STRING
@@ -3628,6 +3655,15 @@ zabbix_export:
           - type: STRING
             name: lefty_max
             value: '100'
+          - type: STRING
+            name: righty_min
+            value: '0'
+          - type: STRING
+            name: righty_max
+            value: '100'
+          - type: INTEGER
+            name: righty
+            value: '0'
           - type: INTEGER
             name: legend_lines
             value: '3'
