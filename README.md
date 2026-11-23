@@ -60,7 +60,9 @@ The Alerts and Inventory master and dependent items are disabled by default beca
 
 ### EMS administrator permissions
 
-The template was tested with FortiClient EMS 7.4.8. In one non-multitenant installation, both Read-only Administrator and Standard Administrator received HTTP 403 for `client_certificates/index`, `sites/names/index`, and `performance_dashboard/login`; Super Administrator succeeded. These observations establish Super Administrator as the lowest **built-in** role verified for all API groups, but do not rule out a narrower custom role. The certificate client-count request is disabled by default so that a denied client-certificate request does not block server certificate expiry data. Inventory is disabled by default. If the account cannot open the EMS Performance dashboard, disable `ems.api.perfmon.raw` and its no-data trigger; its dependent performance items will not update. The optional repackager endpoint may time out independently of permissions. The `Global` scope in the table means that a metric describes the EMS server rather than one site; it does not imply that multitenancy is enabled.
+The template was tested with FortiClient EMS 7.4.8. In a non-multitenant lab, a temporary custom role cloned from Read-only Administrator returned HTTP 200 for `license/get` and `server_certificates/index`, but HTTP 403 for `client_certificates/index`, `sites/names/index`, and `performance_dashboard/login`. Enabling CA certificate management, EMS settings management, and finally **every selectable permission** on that custom role did not change those three HTTP 403 responses. Super Administrator returned HTTP 200 for all three. Fresh sessions were used after each role change, and the temporary user and role were deleted after testing. This strongly indicates that those three routes require the Super Administrator role in EMS 7.4.8 rather than an individual selectable permission. Recheck after EMS upgrades.
+
+For a read-only account, leave client certificate collection and inventory disabled, and disable `ems.api.perfmon.raw` and its no-data trigger; CPU, RAM, disk, and other performance items will not update. The certificate client-count request is disabled by default so that a denied request does not block server certificate expiry data. Inventory is disabled by default. The optional repackager endpoint may time out independently of permissions. The `Global` scope in the table means that a metric describes the EMS server rather than one site; it does not imply that multitenancy is enabled.
 
 The disk item is the highest usage across all returned volumes, including `/boot` when present. The API data identifies disk devices rather than mount points, so the template does not exclude `/boot` automatically. A full boot partition can also prevent upgrades. Use host-level disk monitoring when mount-specific alerts are needed.
 
@@ -92,7 +94,7 @@ Endpoint online percentage and critical vulnerability triggers are included but 
 
 ## Host dashboard
 
-The template includes **EMS: Overview**, a host dashboard with EPP and ZTNA license summaries, online and offline endpoint counts, 24-hour CPU/RAM/disk graphs, an EPP used-versus-allocated seats graph, and current problems. It uses enabled items only. Open it from the monitored host's Dashboards tab after linking the template.
+The template includes **EMS: Overview**, a host dashboard with an EPP license seats graph, a ZTNA license summary, online and offline endpoint counts, CPU/RAM/disk graphs, and current problems. The EPP graph shows used seats, allocated capacity, and a warning line calculated as allocation × `{$EMS.API.LICENSE.WARN}` / 100. Its Y-axis starts at zero; the legend shows the threshold percentage in the item name and the numeric seat value. CPU, RAM, and disk graphs also show a 15-minute average alongside the raw values. The graphs follow the dashboard time selector. Open the dashboard from the monitored host's Dashboards tab after linking the template.
 
 ## Data handling and compatibility
 
@@ -102,7 +104,7 @@ The license, dashboard, and several other routes were observed in the EMS web in
 
 ## Validation
 
-Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Six collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. The host dashboard imported with all nine widgets; all four graphs returned SVG data through the Zabbix widget endpoint.
+Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Six collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. The host dashboard imported with eight widgets; all four graphs rendered in the lab. The calculated EPP warning line returned 2.7 seats for a 90% threshold and three allocated seats.
 
 References: [Zabbix Script items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/script), [dependent items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/dependent_items), and [template import](https://www.zabbix.com/documentation/7.0/en/manual/api/reference/configuration/import).
 
