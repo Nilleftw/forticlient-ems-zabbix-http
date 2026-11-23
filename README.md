@@ -52,6 +52,8 @@ Each collection group has one Script master item and dependent metrics. **Disabl
 | Security | `ems.api.security.raw` | 30m | Site | Enabled | Vulnerabilities, affected endpoints, profile/tag errors, active forensics |
 | Performance | `ems.api.perfmon.raw` | 5m | Global | Enabled | CPU, RAM, highest disk usage, EMS node count, database latency; optional diagnostics |
 | System | `ems.api.system.raw` | 15m | Global | Enabled | HA members, signature update and upgrade status; optional repackager status |
+| EMS identity | `ems.api.identity.raw` | 1h | Global | Enabled | Installed EMS version/build, uptime, and HA or standalone mode |
+| Client dashboard | `ems.api.client_dashboard.raw` | 1h | Site | Enabled | FortiClient version counts by OS and endpoint fabric activity |
 | Certificates | `ems.api.certificates.raw` | 1h | Global | Enabled | Server certificate count and expiry; optional client certificate count |
 | Alerts | `ems.api.alerts.raw` | 10m | Site | Disabled | Alert count and unread alerts for the API account |
 | Inventory | `ems.api.inventory.raw` | 1h | Global | Disabled | Site and workgroup counts |
@@ -94,7 +96,9 @@ Endpoint online percentage and critical vulnerability triggers are included but 
 
 ## Host dashboard
 
-The template includes **EMS: Overview**, a host dashboard with EPP used/capacity and available-seat values, a ZTNA license summary, a combined online/total endpoint count, CPU/RAM/disk graphs, and current problems. The endpoint total includes managed and unmanaged endpoints. EPP utilization generates a problem when it reaches `{$EMS.API.LICENSE.WARN}` percent; the dashboard shows the current seat counts instead of a nearly flat license graph. CPU, RAM, and disk graphs show one series each with their simple trigger thresholds on 0–100% axes. These graphs show minimum, average, and maximum values in the legend and follow the dashboard time selector. The CPU, RAM, and disk trigger expressions evaluate 15-minute averages. Open the dashboard from the monitored host's Dashboards tab after linking the template.
+The template includes **EMS: Overview**, a host dashboard with EPP used/capacity and available-seat values, a ZTNA license summary, a combined online/total endpoint count, CPU/RAM/disk graphs, and current problems. The endpoint total includes managed and unmanaged endpoints. EPP utilization generates a problem when it reaches `{$EMS.API.LICENSE.WARN}` percent; the dashboard shows the current seat counts instead of a nearly flat license graph. CPU, RAM, and disk graphs show one series each with their simple trigger thresholds on 0–100% axes. These graphs show minimum, average, and maximum values in the legend and follow the dashboard time selector. The CPU, RAM, and disk trigger expressions evaluate 15-minute averages.
+
+The second page, **System and clients**, shows the installed EMS version/build, uptime, standalone or HA mode, FortiClient version distribution by Windows/macOS/Linux, and endpoint on-fabric/off-fabric activity. Version items are discovered only for versions with nonzero counts. This page does not repeat license, endpoint connection, or resource metrics from Overview. EMS hostname, system clock, and available upgrade version are already available through the host name, dashboard clock, or existing system items and are not duplicated as widgets. Open the dashboard from the monitored host's Dashboards tab after linking the template.
 
 ## Data handling and compatibility
 
@@ -104,7 +108,7 @@ The license, dashboard, and several other routes were observed in the EMS web in
 
 ## Validation
 
-Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Six collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. The host dashboard has eight widgets, including three performance graphs.
+Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Eight collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The client-version discovery created Windows and macOS items in the lab; the new dashboard widgets displayed live values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. The host dashboard has two pages with thirteen widgets, including three performance graphs. EMS 7.2.x compatibility has not been tested for the newly added dashboard routes.
 
 References: [Zabbix Script items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/script), [dependent items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/dependent_items), and [template import](https://www.zabbix.com/documentation/7.0/en/manual/api/reference/configuration/import).
 
