@@ -3890,7 +3890,7 @@ zabbix_export:
             value: '0'
           - type: INTEGER
             name: value_size
-            value: '25'
+            value: '16'
         - type: item
           name: EPP licenses available
           x: '12'
@@ -3917,9 +3917,9 @@ zabbix_export:
             value: '0'
         - type: problems
           name: Problems
-          x: '0'
-          y: '13'
-          width: '72'
+          x: '48'
+          y: '3'
+          width: '24'
           height: '4'
           fields:
           - type: STRING
