@@ -3636,7 +3636,7 @@ zabbix_export:
               key: ems.api.license.epp.allocated
           - type: INTEGER
             name: ds.1.fill
-            value: '1'
+            value: '0'
           - type: INTEGER
             name: ds.2.dataset_type
             value: '0'
@@ -3650,7 +3650,7 @@ zabbix_export:
               key: ems.api.license.epp.warning_seats
           - type: INTEGER
             name: ds.2.fill
-            value: '1'
+            value: '0'
           - type: STRING
             name: lefty_min
             value: '0'
