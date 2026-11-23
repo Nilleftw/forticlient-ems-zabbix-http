@@ -210,21 +210,6 @@ zabbix_export:
         value: license-api
       - tag: license_type
         value: EPP
-    - uuid: effe729977f9483fae27c1918955e1fc
-      name: 'EPP warning ({$EMS.API.LICENSE.WARN}% of capacity)'
-      type: CALCULATED
-      key: ems.api.license.epp.warning_seats
-      delay: 5m
-      history: 30d
-      trends: 365d
-      value_type: FLOAT
-      params: 'last(//ems.api.license.epp.allocated)*{$EMS.API.LICENSE.WARN}/100'
-      description: Visual seat threshold derived from EPP capacity and the license warning macro. The EPP utilization trigger generates alerts independently.
-      tags:
-      - tag: component
-        value: license-api
-      - tag: license_type
-        value: EPP
     - uuid: 36f42acc84dc4e0db09dc2971622ea5f
       name: 'Site {$EMS.API.SITE}: EPP Available'
       type: DEPENDENT
@@ -3556,70 +3541,45 @@ zabbix_export:
           - type: INTEGER
             name: legend_statistic
             value: '1'
-        - type: svggraph
-          name: EPP license seats
+        - type: item
+          name: EPP licenses used / capacity
           x: '0'
           y: '0'
-          width: '48'
+          width: '24'
           height: '6'
           fields:
-          - type: INTEGER
-            name: ds.0.dataset_type
-            value: '0'
-          - type: STRING
-            name: ds.0.color.0
-            value: 1976D2
           - type: ITEM
-            name: ds.0.itemids.0
+            name: itemid.0
             value:
               host: FortiClient EMS by HTTP
-              key: ems.api.license.epp.used
+              key: ems.api.license.epp.summary
           - type: INTEGER
-            name: ds.0.fill
-            value: '1'
+            name: show.0
+            value: '2'
           - type: INTEGER
-            name: ds.1.dataset_type
-            value: '0'
-          - type: STRING
-            name: ds.1.color.0
-            value: 9E9E9E
+            name: value_size
+            value: '12'
+        - type: item
+          name: EPP licenses available
+          x: '24'
+          y: '0'
+          width: '24'
+          height: '6'
+          fields:
           - type: ITEM
-            name: ds.1.itemids.0
+            name: itemid.0
             value:
               host: FortiClient EMS by HTTP
-              key: ems.api.license.epp.allocated
+              key: ems.api.license.epp.available
           - type: INTEGER
-            name: ds.1.fill
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: value_size
+            value: '26'
+          - type: INTEGER
+            name: decimal_places
             value: '0'
-          - type: INTEGER
-            name: ds.2.dataset_type
-            value: '0'
-          - type: STRING
-            name: ds.2.color.0
-            value: FFC859
-          - type: ITEM
-            name: ds.2.itemids.0
-            value:
-              host: FortiClient EMS by HTTP
-              key: ems.api.license.epp.warning_seats
-          - type: INTEGER
-            name: ds.2.fill
-            value: '0'
-          - type: STRING
-            name: lefty_min
-            value: '0'
-          - type: STRING
-            name: reference
-            value: EMLIC
-          - type: STRING
-            name: time_period._reference
-            value: DASHBOARD._timeperiod
-          - type: INTEGER
-            name: legend_lines
-            value: '3'
-          - type: INTEGER
-            name: legend_statistic
-            value: '1'
         - type: problems
           name: Problems
           x: '0'
