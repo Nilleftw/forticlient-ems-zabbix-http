@@ -210,6 +210,21 @@ zabbix_export:
         value: license-api
       - tag: license_type
         value: EPP
+    - uuid: effe729977f9483fae27c1918955e1fc
+      name: 'EPP warning at {$EMS.API.LICENSE.WARN}%'
+      type: CALCULATED
+      key: ems.api.license.epp.warning_seats
+      delay: 5m
+      history: 30d
+      trends: 365d
+      value_type: FLOAT
+      params: 'last(//ems.api.license.epp.allocated)*{$EMS.API.LICENSE.WARN}/100'
+      description: Seat threshold derived from current allocation and the license warning macro. For 1000 allocated seats and a 90% threshold, the result is 900.
+      tags:
+      - tag: component
+        value: license-api
+      - tag: license_type
+        value: EPP
     - uuid: 36f42acc84dc4e0db09dc2971622ea5f
       name: 'Site {$EMS.API.SITE}: EPP Available'
       type: DEPENDENT
@@ -3390,26 +3405,8 @@ zabbix_export:
       - name: Overview
         widgets:
         - type: item
-          name: EPP used / capacity
-          x: '48'
-          width: '24'
-          height: '2'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: FortiClient EMS by HTTP
-              key: ems.api.license.epp.summary
-          - type: INTEGER
-            name: show.0
-            value: '2'
-          - type: INTEGER
-            name: value_size
-            value: '28'
-        - type: item
           name: ZTNA licenses used / allocated
           x: '48'
-          y: '2'
           width: '24'
           height: '2'
           fields:
@@ -3427,9 +3424,9 @@ zabbix_export:
         - type: item
           name: Endpoints online / total
           x: '48'
-          y: '4'
+          y: '2'
           width: '24'
-          height: '2'
+          height: '4'
           fields:
           - type: ITEM
             name: itemid.0
@@ -3560,7 +3557,7 @@ zabbix_export:
             name: legend_statistic
             value: '1'
         - type: svggraph
-          name: EPP license utilization
+          name: EPP license seats
           x: '0'
           y: '0'
           width: '48'
@@ -3576,16 +3573,41 @@ zabbix_export:
             name: ds.0.itemids.0
             value:
               host: FortiClient EMS by HTTP
-              key: ems.api.license.epp.utilization
+              key: ems.api.license.epp.used
           - type: INTEGER
             name: ds.0.fill
             value: '1'
+          - type: INTEGER
+            name: ds.1.dataset_type
+            value: '0'
+          - type: STRING
+            name: ds.1.color.0
+            value: 9E9E9E
+          - type: ITEM
+            name: ds.1.itemids.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.license.epp.allocated
+          - type: INTEGER
+            name: ds.1.fill
+            value: '0'
+          - type: INTEGER
+            name: ds.2.dataset_type
+            value: '0'
+          - type: STRING
+            name: ds.2.color.0
+            value: E53935
+          - type: ITEM
+            name: ds.2.itemids.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.license.epp.warning_seats
+          - type: INTEGER
+            name: ds.2.fill
+            value: '0'
           - type: STRING
             name: lefty_min
             value: '0'
-          - type: STRING
-            name: lefty_max
-            value: '100'
           - type: STRING
             name: reference
             value: EMLIC
@@ -3593,11 +3615,8 @@ zabbix_export:
             name: time_period._reference
             value: DASHBOARD._timeperiod
           - type: INTEGER
-            name: simple_triggers
-            value: '1'
-          - type: INTEGER
             name: legend_lines
-            value: '2'
+            value: '3'
           - type: INTEGER
             name: legend_statistic
             value: '1'
