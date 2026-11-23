@@ -2021,7 +2021,6 @@ zabbix_export:
             var ha = get('system/ha/info');
             var signatures = get('system/signatures/poll');
             var upgrade = get('system/check_upgrade');
-            var repackager = get('system/cloud/repackager/status');
             if (!Array.isArray(ha.members)) throw 'EMS HA schema changed';
             var alive = 0, primaryAlive = 0;
             ha.members.forEach(function (member) {
@@ -2032,8 +2031,11 @@ zabbix_export:
                 ha_primary_alive: primaryAlive,
                 signatures_updating: signatures.is_updating ? 1 : 0,
                 upgrade_available: upgrade.is_available ? 1 : 0,
-                upgrade_version: upgrade.version || 'none',
-                repackager_available: repackager.is_server_available ? 1 : 0};
+                upgrade_version: upgrade.version || 'none'};
+            if (String(p.repackager_enabled) === '1') {
+                var repackager = get('system/cloud/repackager/status');
+                out.repackager_available = repackager.is_server_available ? 1 : 0;
+            }
         } else if (group === 'alerts') {
             var alerts = get('alerts/count');
             var unread = get('alerts/count_unread');
@@ -2077,6 +2079,8 @@ zabbix_export:
         value: '{$EMS.API.PASSWORD}'
       - name: group
         value: system
+      - name: repackager_enabled
+        value: '{$EMS.API.SYSTEM.REPACKAGER.ENABLED}'
       description: Collects only normalized system metrics. Disable this master item to stop its API requests.
       tags:
       - tag: component
@@ -2210,6 +2214,7 @@ zabbix_export:
       name: 'Site {$EMS.API.SITE}: Repackager available'
       type: DEPENDENT
       key: ems.api.system.repackager_available
+      status: DISABLED
       delay: '0'
       history: 30d
       trends: 365d
@@ -2606,7 +2611,6 @@ zabbix_export:
                 unread_for_api_account: count(unread.count, 'unread alerts')};
         } else if (group === 'certificates') {
             var server = get('server_certificates/index');
-            var client = get('client_certificates/index');
             if (!Array.isArray(server)) throw 'EMS server certificate schema changed';
             var now = new Date();
             var today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
@@ -2619,9 +2623,13 @@ zabbix_export:
                 if (day < today) expired++;
                 else if (day <= today + 30 * 86400000) soon++;
             });
-            out = {server_total: server.length, client_total: count(client.total, 'client certificates'),
+            out = {server_total: server.length,
                 server_expired: expired, server_expiring_30d: soon,
                 earliest_server_expiry: earliest === null ? 'none' : new Date(earliest).toISOString().slice(0, 10)};
+            if (String(p.client_enabled) === '1') {
+                var client = get('client_certificates/index');
+                out.client_total = count(client.total, 'client certificates');
+            }
         } else if (group === 'inventory') {
             var sites = get('sites/names/index');
             var workgroups = get('workgroups/index?tree=false&custom=false');
@@ -2642,6 +2650,8 @@ zabbix_export:
         value: '{$EMS.API.PASSWORD}'
       - name: group
         value: certificates
+      - name: client_enabled
+        value: '{$EMS.API.CERTIFICATES.CLIENT.ENABLED}'
       description: Collects only normalized certificates metrics. Disable this master item to stop its API requests.
       tags:
       - tag: component
@@ -2680,6 +2690,7 @@ zabbix_export:
       name: 'Site {$EMS.API.SITE}: Client certificates'
       type: DEPENDENT
       key: ems.api.certificates.client_total
+      status: DISABLED
       delay: '0'
       history: 30d
       trends: 365d
@@ -3319,12 +3330,18 @@ zabbix_export:
     - macro: '{$EMS.API.SYSTEM.INTERVAL}'
       value: 15m
       description: Polling interval for system API master item.
+    - macro: '{$EMS.API.SYSTEM.REPACKAGER.ENABLED}'
+      value: '0'
+      description: Set to 1 to query optional cloud repackager status; enable its dependent item separately.
     - macro: '{$EMS.API.ALERTS.INTERVAL}'
       value: 10m
       description: Polling interval for alerts API master item.
     - macro: '{$EMS.API.CERTIFICATES.INTERVAL}'
       value: 1h
       description: Polling interval for certificates API master item.
+    - macro: '{$EMS.API.CERTIFICATES.CLIENT.ENABLED}'
+      value: '0'
+      description: Set to 1 to query client certificate count; enable its dependent item separately.
     - macro: '{$EMS.API.INVENTORY.INTERVAL}'
       value: 1h
       description: Polling interval for inventory API master item.
