@@ -94,7 +94,7 @@ Endpoint online percentage and critical vulnerability triggers are included but 
 
 ## Host dashboard
 
-The template includes **EMS: Overview**, a host dashboard with an EPP license seats graph, a ZTNA license summary, a combined online/total endpoint count, CPU/RAM/disk graphs, and current problems. The endpoint total includes managed and unmanaged endpoints. The EPP graph shows used seats, capacity, and a warning line on an axis starting at zero. The warning line is calculated as capacity × `{$EMS.API.LICENSE.WARN}` / 100; for 1,000 seats and a 90% warning threshold, it appears at 900 seats. The separate EPP utilization trigger generates problems at the same percentage. CPU, RAM, and disk graphs show one series each with their simple trigger thresholds on 0–100% axes. All graphs show minimum, average, and maximum values in the legend and follow the dashboard time selector. The CPU, RAM, and disk trigger expressions evaluate 15-minute averages. Open the dashboard from the monitored host's Dashboards tab after linking the template.
+The template includes **EMS: Overview**, a host dashboard with EPP used/capacity and available-seat values, a ZTNA license summary, a combined online/total endpoint count, CPU/RAM/disk graphs, and current problems. The endpoint total includes managed and unmanaged endpoints. EPP utilization generates a problem when it reaches `{$EMS.API.LICENSE.WARN}` percent; the dashboard shows the current seat counts instead of a nearly flat license graph. CPU, RAM, and disk graphs show one series each with their simple trigger thresholds on 0–100% axes. These graphs show minimum, average, and maximum values in the legend and follow the dashboard time selector. The CPU, RAM, and disk trigger expressions evaluate 15-minute averages. Open the dashboard from the monitored host's Dashboards tab after linking the template.
 
 ## Data handling and compatibility
 
@@ -104,7 +104,7 @@ The license, dashboard, and several other routes were observed in the EMS web in
 
 ## Validation
 
-Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Six collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. The host dashboard imported with seven widgets; all four graphs rendered in the lab.
+Imported into Zabbix 7.0.32 and tested against FortiClient EMS 7.4.8. Six collection groups are enabled by default and two are optional. The license discovery created nine Chromebook items with correct values. The HTTP template provides 22 trigger definitions, including three license discovery trigger prototypes; 20 are enabled and two are disabled by default. The host dashboard has eight widgets, including three performance graphs.
 
 References: [Zabbix Script items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/script), [dependent items](https://www.zabbix.com/documentation/7.0/en/manual/config/items/itemtypes/dependent_items), and [template import](https://www.zabbix.com/documentation/7.0/en/manual/api/reference/configuration/import).
 
