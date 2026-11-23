@@ -3908,7 +3908,7 @@ zabbix_export:
         - type: problems
           name: Problems
           x: '0'
-          y: '12'
+          y: '23'
           width: '72'
           height: '4'
           fields:
@@ -3921,12 +3921,10 @@ zabbix_export:
           - type: INTEGER
             name: show_tags
             value: '1'
-      - name: System and clients
-        widgets:
         - type: item
           name: EMS version
           x: '0'
-          y: '0'
+          y: '12'
           width: '24'
           height: '3'
           fields:
@@ -3944,7 +3942,7 @@ zabbix_export:
         - type: item
           name: EMS uptime
           x: '24'
-          y: '0'
+          y: '12'
           width: '24'
           height: '3'
           fields:
@@ -3962,7 +3960,7 @@ zabbix_export:
         - type: item
           name: EMS mode
           x: '48'
-          y: '0'
+          y: '12'
           width: '24'
           height: '3'
           fields:
@@ -3980,9 +3978,9 @@ zabbix_export:
         - type: piechart
           name: FortiClient versions by OS
           x: '0'
-          y: '3'
+          y: '15'
           width: '36'
-          height: '9'
+          height: '8'
           fields:
           - type: INTEGER
             name: ds.0.dataset_type
@@ -4014,9 +4012,9 @@ zabbix_export:
         - type: piechart
           name: Endpoint fabric activity
           x: '36'
-          y: '3'
+          y: '15'
           width: '36'
-          height: '9'
+          height: '8'
           fields:
           - type: INTEGER
             name: ds.0.dataset_type
