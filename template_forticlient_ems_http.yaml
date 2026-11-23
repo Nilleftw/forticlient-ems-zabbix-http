@@ -169,7 +169,7 @@ zabbix_export:
         - tag: component
           value: license-api
     - uuid: 5242c57e21f14c1980048fbd68af559c
-      name: 'Site {$EMS.API.SITE}: EPP Used'
+      name: 'EPP used'
       type: DEPENDENT
       key: ems.api.license.epp.used
       delay: '0'
@@ -190,7 +190,7 @@ zabbix_export:
       - tag: license_type
         value: EPP
     - uuid: 81f3bcb0be0a4de58ebb245e36776dca
-      name: 'Site {$EMS.API.SITE}: EPP Allocated'
+      name: 'EPP capacity'
       type: DEPENDENT
       key: ems.api.license.epp.allocated
       delay: '0'
@@ -211,7 +211,7 @@ zabbix_export:
       - tag: license_type
         value: EPP
     - uuid: effe729977f9483fae27c1918955e1fc
-      name: 'Site {$EMS.API.SITE}: EPP warning at {$EMS.API.LICENSE.WARN}% of allocation'
+      name: 'EPP warning at {$EMS.API.LICENSE.WARN}%'
       type: CALCULATED
       key: ems.api.license.epp.warning_seats
       delay: 5m
@@ -698,7 +698,7 @@ zabbix_export:
         - tag: component
           value: perfmon-api
     - uuid: eabb0d33d95043b092d3fe6590e62260
-      name: 'Site {$EMS.API.SITE}: Overall CPU usage'
+      name: 'CPU usage'
       type: DEPENDENT
       key: ems.api.perfmon.cpu_pct
       delay: '0'
@@ -727,7 +727,7 @@ zabbix_export:
         - tag: component
           value: perfmon-api
     - uuid: 29be48228dd54bc4a85fffc813f01149
-      name: 'Site {$EMS.API.SITE}: RAM system usage'
+      name: 'RAM usage'
       type: DEPENDENT
       key: ems.api.perfmon.ram_pct
       delay: '0'
@@ -777,7 +777,7 @@ zabbix_export:
       units: '%'
       status: DISABLED
     - uuid: 0f4f24decae44f038274ec1c6e199085
-      name: 'Site {$EMS.API.SITE}: Highest disk usage'
+      name: 'Disk usage'
       type: DEPENDENT
       key: ems.api.perfmon.disk_max_pct
       delay: '0'
@@ -1455,6 +1455,26 @@ zabbix_export:
       - type: JAVASCRIPT
         parameters:
         - 'var n = JSON.parse(value).offline; return n === null || n === undefined ? null : n;'
+      tags:
+      - tag: component
+        value: endpoints-api
+      - tag: scope
+        value: site
+    - uuid: 8a5fd3bc1f874058ab0021586355e414
+      name: 'Endpoints online / offline'
+      type: DEPENDENT
+      key: ems.api.endpoints.summary
+      delay: '0'
+      history: 7d
+      trends: '0'
+      value_type: CHAR
+      master_item:
+        key: ems.api.endpoints.raw
+      preprocessing:
+      - type: JAVASCRIPT
+        parameters:
+        - 'var d = JSON.parse(value); return String(d.online) + " / " + String(d.offline);'
+      description: Compact online and offline endpoint counts for the host dashboard.
       tags:
       - tag: component
         value: endpoints-api
@@ -3402,53 +3422,29 @@ zabbix_export:
             name: value_size
             value: '28'
         - type: item
-          name: Online endpoints
+          name: Endpoints online / offline
           x: '48'
           y: '2'
-          width: '12'
-          height: '3'
+          width: '24'
+          height: '4'
           fields:
           - type: ITEM
             name: itemid.0
             value:
               host: FortiClient EMS by HTTP
-              key: ems.api.endpoints.online
+              key: ems.api.endpoints.summary
           - type: INTEGER
             name: show.0
             value: '2'
           - type: INTEGER
             name: value_size
-            value: '26'
-          - type: INTEGER
-            name: decimal_places
-            value: '0'
-        - type: item
-          name: Offline endpoints
-          x: '60'
-          y: '2'
-          width: '12'
-          height: '3'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: FortiClient EMS by HTTP
-              key: ems.api.endpoints.offline
-          - type: INTEGER
-            name: show.0
-            value: '2'
-          - type: INTEGER
-            name: value_size
-            value: '26'
-          - type: INTEGER
-            name: decimal_places
-            value: '0'
+            value: '30'
         - type: svggraph
           name: CPU utilization
           x: '0'
           y: '6'
           width: '24'
-          height: '5'
+          height: '6'
           fields:
           - type: INTEGER
             name: ds.0.dataset_type
@@ -3494,6 +3490,18 @@ zabbix_export:
             name: time_period._reference
             value: DASHBOARD._timeperiod
           - type: INTEGER
+            name: simple_triggers
+            value: '1'
+          - type: STRING
+            name: lefty_min
+            value: '0'
+          - type: STRING
+            name: lefty_max
+            value: '100'
+          - type: INTEGER
+            name: legend_lines
+            value: '3'
+          - type: INTEGER
             name: legend_statistic
             value: '1'
         - type: svggraph
@@ -3501,7 +3509,7 @@ zabbix_export:
           x: '24'
           y: '6'
           width: '24'
-          height: '5'
+          height: '6'
           fields:
           - type: INTEGER
             name: ds.0.dataset_type
@@ -3547,6 +3555,18 @@ zabbix_export:
             name: time_period._reference
             value: DASHBOARD._timeperiod
           - type: INTEGER
+            name: simple_triggers
+            value: '1'
+          - type: STRING
+            name: lefty_min
+            value: '0'
+          - type: STRING
+            name: lefty_max
+            value: '100'
+          - type: INTEGER
+            name: legend_lines
+            value: '3'
+          - type: INTEGER
             name: legend_statistic
             value: '1'
         - type: svggraph
@@ -3554,7 +3574,7 @@ zabbix_export:
           x: '48'
           y: '6'
           width: '24'
-          height: '5'
+          height: '6'
           fields:
           - type: INTEGER
             name: ds.0.dataset_type
@@ -3599,6 +3619,18 @@ zabbix_export:
           - type: STRING
             name: time_period._reference
             value: DASHBOARD._timeperiod
+          - type: INTEGER
+            name: simple_triggers
+            value: '1'
+          - type: STRING
+            name: lefty_min
+            value: '0'
+          - type: STRING
+            name: lefty_max
+            value: '100'
+          - type: INTEGER
+            name: legend_lines
+            value: '3'
           - type: INTEGER
             name: legend_statistic
             value: '1'
@@ -3661,12 +3693,15 @@ zabbix_export:
             name: time_period._reference
             value: DASHBOARD._timeperiod
           - type: INTEGER
+            name: legend_lines
+            value: '3'
+          - type: INTEGER
             name: legend_statistic
             value: '1'
         - type: problems
           name: Problems
           x: '0'
-          y: '11'
+          y: '12'
           width: '72'
           height: '4'
           fields:
