@@ -8,8 +8,8 @@ The routes below were observed and tested against FortiClient EMS 7.4.8 Linux. A
 | Endpoints | `GET /api/v1/endpoints/count`, `GET /api/v1/endpoints/connection/donut`, `GET /api/v1/endpoints/management/donut` | Endpoint counts and online percentage |
 | Security | `GET /api/v1/vulnerabilities/summary`, `GET /api/v1/profiles/error_count`, `GET /api/v1/tags/zero_trust/error_count`, `GET /api/v1/forensics/active/count` | Vulnerability and error counts |
 | Alerts | `GET /api/v1/alerts/count`, `GET /api/v1/alerts/count_unread` | Alert counts; unread is specific to the API account |
-| System | `GET /api/v1/system/ha/info`, `GET /api/v1/system/signatures/poll`, `GET /api/v1/system/check_upgrade`, `GET /api/v1/system/cloud/repackager/status` | HA, signature, upgrade and repackager status |
-| Certificates | `GET /api/v1/server_certificates/index`, `GET /api/v1/client_certificates/index` | Counts and server certificate expiry summary |
+| System | `GET /api/v1/system/ha/info`, `GET /api/v1/system/signatures/poll`, `GET /api/v1/system/check_upgrade`; optional `GET /api/v1/system/cloud/repackager/status` | HA, signature and upgrade status; optional repackager status |
+| Certificates | `GET /api/v1/server_certificates/index`; optional `GET /api/v1/client_certificates/index` | Server certificate count and expiry summary; optional client certificate count |
 | Inventory | `GET /api/v1/sites/names/index`, `GET /api/v1/workgroups/index` | Site and workgroup counts |
 | Performance | `POST /api/v1/performance_dashboard/login`, `GET /api/v1/performance_dashboard/dashboard_search`, internal Grafana dashboard definition and data query | CPU, RAM, disk, EMS node count and DB latency by default; optional database, network, keep-alive and process diagnostics when extended collection is enabled |
 
