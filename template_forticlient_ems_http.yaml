@@ -210,21 +210,6 @@ zabbix_export:
         value: license-api
       - tag: license_type
         value: EPP
-    - uuid: effe729977f9483fae27c1918955e1fc
-      name: 'EPP warning at {$EMS.API.LICENSE.WARN}%'
-      type: CALCULATED
-      key: ems.api.license.epp.warning_seats
-      delay: 5m
-      history: 30d
-      trends: 365d
-      value_type: FLOAT
-      params: 'last(//ems.api.license.epp.allocated)*{$EMS.API.LICENSE.WARN}/100'
-      description: Numeric EPP seat warning line derived from the current allocation and the license warning macro. For 1000 allocated seats and a 90% threshold, the result is 900.
-      tags:
-      - tag: component
-        value: license-api
-      - tag: license_type
-        value: EPP
     - uuid: 36f42acc84dc4e0db09dc2971622ea5f
       name: 'Site {$EMS.API.SITE}: EPP Available'
       type: DEPENDENT
@@ -247,7 +232,7 @@ zabbix_export:
       - tag: license_type
         value: EPP
     - uuid: d42e328464284b5d87cc107f4cb8e0f5
-      name: 'Site {$EMS.API.SITE}: EPP Utilization'
+      name: 'EPP utilization'
       type: DEPENDENT
       key: ems.api.license.epp.utilization
       delay: '0'
@@ -271,7 +256,7 @@ zabbix_export:
       description: Reports 0 when no seats are allocated so the numeric item remains supported. Check Allocated or Summary to distinguish unlicensed from unused seats.
       triggers:
       - uuid: 89e145da73da42c48fceb92be760190e
-        expression: last(/FortiClient EMS by HTTP/ems.api.license.epp.allocated)>0 and last(/FortiClient EMS by HTTP/ems.api.license.epp.utilization)>={$EMS.API.LICENSE.WARN}
+        expression: last(/FortiClient EMS by HTTP/ems.api.license.epp.utilization)>={$EMS.API.LICENSE.WARN}
         name: 'Site {$EMS.API.SITE}: EPP license utilization is high'
         priority: WARNING
         description: Active site allocation has reached the configured utilization threshold.
@@ -3405,8 +3390,26 @@ zabbix_export:
       - name: Overview
         widgets:
         - type: item
+          name: EPP used / capacity
+          x: '48'
+          width: '24'
+          height: '2'
+          fields:
+          - type: ITEM
+            name: itemid.0
+            value:
+              host: FortiClient EMS by HTTP
+              key: ems.api.license.epp.summary
+          - type: INTEGER
+            name: show.0
+            value: '2'
+          - type: INTEGER
+            name: value_size
+            value: '28'
+        - type: item
           name: ZTNA licenses used / allocated
           x: '48'
+          y: '2'
           width: '24'
           height: '2'
           fields:
@@ -3424,9 +3427,9 @@ zabbix_export:
         - type: item
           name: Endpoints online / total
           x: '48'
-          y: '2'
+          y: '4'
           width: '24'
-          height: '4'
+          height: '2'
           fields:
           - type: ITEM
             name: itemid.0
@@ -3457,35 +3460,6 @@ zabbix_export:
             value:
               host: FortiClient EMS by HTTP
               key: ems.api.perfmon.cpu_pct
-          - type: INTEGER
-            name: ds.1.dataset_type
-            value: '0'
-          - type: STRING
-            name: ds.1.color.0
-            value: 90CAF9
-          - type: ITEM
-            name: ds.1.itemids.0
-            value:
-              host: FortiClient EMS by HTTP
-              key: ems.api.perfmon.cpu_pct
-          - type: INTEGER
-            name: ds.1.aggregate_function
-            value: '3'
-          - type: STRING
-            name: ds.1.aggregate_interval
-            value: 15m
-          - type: INTEGER
-            name: ds.1.aggregate_grouping
-            value: '1'
-          - type: STRING
-            name: ds.1.data_set_label
-            value: 15m average
-          - type: INTEGER
-            name: ds.1.axisy
-            value: '1'
-          - type: INTEGER
-            name: ds.1.fill
-            value: '1'
           - type: STRING
             name: reference
             value: EMCPU
@@ -3501,18 +3475,9 @@ zabbix_export:
           - type: STRING
             name: lefty_max
             value: '100'
-          - type: STRING
-            name: righty_min
-            value: '0'
-          - type: STRING
-            name: righty_max
-            value: '100'
-          - type: INTEGER
-            name: righty
-            value: '0'
           - type: INTEGER
             name: legend_lines
-            value: '3'
+            value: '2'
           - type: INTEGER
             name: legend_statistic
             value: '1'
@@ -3534,35 +3499,6 @@ zabbix_export:
             value:
               host: FortiClient EMS by HTTP
               key: ems.api.perfmon.ram_pct
-          - type: INTEGER
-            name: ds.1.dataset_type
-            value: '0'
-          - type: STRING
-            name: ds.1.color.0
-            value: A5D6A7
-          - type: ITEM
-            name: ds.1.itemids.0
-            value:
-              host: FortiClient EMS by HTTP
-              key: ems.api.perfmon.ram_pct
-          - type: INTEGER
-            name: ds.1.aggregate_function
-            value: '3'
-          - type: STRING
-            name: ds.1.aggregate_interval
-            value: 15m
-          - type: INTEGER
-            name: ds.1.aggregate_grouping
-            value: '1'
-          - type: STRING
-            name: ds.1.data_set_label
-            value: 15m average
-          - type: INTEGER
-            name: ds.1.axisy
-            value: '1'
-          - type: INTEGER
-            name: ds.1.fill
-            value: '1'
           - type: STRING
             name: reference
             value: EMRAM
@@ -3578,18 +3514,9 @@ zabbix_export:
           - type: STRING
             name: lefty_max
             value: '100'
-          - type: STRING
-            name: righty_min
-            value: '0'
-          - type: STRING
-            name: righty_max
-            value: '100'
-          - type: INTEGER
-            name: righty
-            value: '0'
           - type: INTEGER
             name: legend_lines
-            value: '3'
+            value: '2'
           - type: INTEGER
             name: legend_statistic
             value: '1'
@@ -3611,35 +3538,6 @@ zabbix_export:
             value:
               host: FortiClient EMS by HTTP
               key: ems.api.perfmon.disk_max_pct
-          - type: INTEGER
-            name: ds.1.dataset_type
-            value: '0'
-          - type: STRING
-            name: ds.1.color.0
-            value: FFE082
-          - type: ITEM
-            name: ds.1.itemids.0
-            value:
-              host: FortiClient EMS by HTTP
-              key: ems.api.perfmon.disk_max_pct
-          - type: INTEGER
-            name: ds.1.aggregate_function
-            value: '3'
-          - type: STRING
-            name: ds.1.aggregate_interval
-            value: 15m
-          - type: INTEGER
-            name: ds.1.aggregate_grouping
-            value: '1'
-          - type: STRING
-            name: ds.1.data_set_label
-            value: 15m average
-          - type: INTEGER
-            name: ds.1.axisy
-            value: '1'
-          - type: INTEGER
-            name: ds.1.fill
-            value: '1'
           - type: STRING
             name: reference
             value: EMDSK
@@ -3655,23 +3553,14 @@ zabbix_export:
           - type: STRING
             name: lefty_max
             value: '100'
-          - type: STRING
-            name: righty_min
-            value: '0'
-          - type: STRING
-            name: righty_max
-            value: '100'
-          - type: INTEGER
-            name: righty
-            value: '0'
           - type: INTEGER
             name: legend_lines
-            value: '3'
+            value: '2'
           - type: INTEGER
             name: legend_statistic
             value: '1'
         - type: svggraph
-          name: EPP license seats
+          name: EPP license utilization
           x: '0'
           y: '0'
           width: '48'
@@ -3687,41 +3576,16 @@ zabbix_export:
             name: ds.0.itemids.0
             value:
               host: FortiClient EMS by HTTP
-              key: ems.api.license.epp.used
+              key: ems.api.license.epp.utilization
           - type: INTEGER
             name: ds.0.fill
             value: '1'
-          - type: INTEGER
-            name: ds.1.dataset_type
-            value: '0'
-          - type: STRING
-            name: ds.1.color.0
-            value: 9E9E9E
-          - type: ITEM
-            name: ds.1.itemids.0
-            value:
-              host: FortiClient EMS by HTTP
-              key: ems.api.license.epp.allocated
-          - type: INTEGER
-            name: ds.1.fill
-            value: '0'
-          - type: INTEGER
-            name: ds.2.dataset_type
-            value: '0'
-          - type: STRING
-            name: ds.2.color.0
-            value: E53935
-          - type: ITEM
-            name: ds.2.itemids.0
-            value:
-              host: FortiClient EMS by HTTP
-              key: ems.api.license.epp.warning_seats
-          - type: INTEGER
-            name: ds.2.fill
-            value: '0'
           - type: STRING
             name: lefty_min
             value: '0'
+          - type: STRING
+            name: lefty_max
+            value: '100'
           - type: STRING
             name: reference
             value: EMLIC
@@ -3729,8 +3593,11 @@ zabbix_export:
             name: time_period._reference
             value: DASHBOARD._timeperiod
           - type: INTEGER
+            name: simple_triggers
+            value: '1'
+          - type: INTEGER
             name: legend_lines
-            value: '3'
+            value: '2'
           - type: INTEGER
             name: legend_statistic
             value: '1'
