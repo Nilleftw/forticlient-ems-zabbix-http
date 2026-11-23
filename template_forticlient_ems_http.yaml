@@ -3716,9 +3716,10 @@ zabbix_export:
         widgets:
         - type: item
           name: ZTNA licenses used / allocated
-          x: '48'
-          width: '24'
-          height: '2'
+          y: '0'
+          x: '24'
+          width: '12'
+          height: '3'
           fields:
           - type: ITEM
             name: itemid.0
@@ -3733,10 +3734,10 @@ zabbix_export:
             value: '28'
         - type: item
           name: Endpoints online / total
-          x: '48'
-          y: '2'
-          width: '24'
-          height: '4'
+          x: '36'
+          y: '0'
+          width: '12'
+          height: '3'
           fields:
           - type: ITEM
             name: itemid.0
@@ -3752,7 +3753,7 @@ zabbix_export:
         - type: svggraph
           name: CPU utilization
           x: '0'
-          y: '6'
+          y: '7'
           width: '24'
           height: '6'
           fields:
@@ -3791,7 +3792,7 @@ zabbix_export:
         - type: svggraph
           name: RAM utilization
           x: '24'
-          y: '6'
+          y: '7'
           width: '24'
           height: '6'
           fields:
@@ -3830,7 +3831,7 @@ zabbix_export:
         - type: svggraph
           name: Highest disk utilization
           x: '48'
-          y: '6'
+          y: '7'
           width: '24'
           height: '6'
           fields:
@@ -3870,8 +3871,8 @@ zabbix_export:
           name: EPP licenses used / capacity
           x: '0'
           y: '0'
-          width: '24'
-          height: '6'
+          width: '12'
+          height: '3'
           fields:
           - type: ITEM
             name: itemid.0
@@ -3882,14 +3883,20 @@ zabbix_export:
             name: show.0
             value: '2'
           - type: INTEGER
+            name: units_bold
+            value: '0'
+          - type: INTEGER
+            name: units_show
+            value: '0'
+          - type: INTEGER
             name: value_size
-            value: '12'
+            value: '25'
         - type: item
           name: EPP licenses available
-          x: '24'
+          x: '12'
           y: '0'
-          width: '24'
-          height: '6'
+          width: '12'
+          height: '3'
           fields:
           - type: ITEM
             name: itemid.0
@@ -3900,6 +3907,9 @@ zabbix_export:
             name: show.0
             value: '2'
           - type: INTEGER
+            name: show.1
+            value: '4'
+          - type: INTEGER
             name: value_size
             value: '26'
           - type: INTEGER
@@ -3908,7 +3918,7 @@ zabbix_export:
         - type: problems
           name: Problems
           x: '0'
-          y: '23'
+          y: '13'
           width: '72'
           height: '4'
           fields:
@@ -3923,9 +3933,9 @@ zabbix_export:
             value: '1'
         - type: item
           name: EMS version
-          x: '0'
-          y: '12'
-          width: '24'
+          x: '48'
+          y: '0'
+          width: '12'
           height: '3'
           fields:
           - type: ITEM
@@ -3941,9 +3951,9 @@ zabbix_export:
             value: '20'
         - type: item
           name: EMS uptime
-          x: '24'
-          y: '12'
-          width: '24'
+          x: '60'
+          y: '0'
+          width: '12'
           height: '3'
           fields:
           - type: ITEM
@@ -3957,30 +3967,12 @@ zabbix_export:
           - type: INTEGER
             name: value_size
             value: '20'
-        - type: item
-          name: EMS mode
-          x: '48'
-          y: '12'
-          width: '24'
-          height: '3'
-          fields:
-          - type: ITEM
-            name: itemid.0
-            value:
-              host: FortiClient EMS by HTTP
-              key: ems.api.identity.mode
-          - type: INTEGER
-            name: show.0
-            value: '2'
-          - type: INTEGER
-            name: value_size
-            value: '20'
         - type: piechart
           name: FortiClient versions by OS
           x: '0'
-          y: '15'
-          width: '36'
-          height: '8'
+          y: '3'
+          width: '24'
+          height: '4'
           fields:
           - type: INTEGER
             name: ds.0.dataset_type
@@ -4011,10 +4003,10 @@ zabbix_export:
             value: '8'
         - type: piechart
           name: Endpoint fabric activity
-          x: '36'
-          y: '15'
-          width: '36'
-          height: '8'
+          x: '24'
+          y: '3'
+          width: '24'
+          height: '4'
           fields:
           - type: INTEGER
             name: ds.0.dataset_type
